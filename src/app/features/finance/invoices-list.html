@@ -1,0 +1,36 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Invoices</h1>
+      <p class="muted">{{ rows().length }} invoices</p>
+    </div>
+  </div>
+
+  @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  <gw-card padding="lg" class="mb-4">
+    <p class="muted mb-2">Create tax invoice from a dispatched shipment</p>
+    <div class="d-flex gap-2 items-end" style="max-width:520px">
+      <gw-form-field label="Shipment" style="flex:1"><gw-select [formControl]="shipmentControl" [options]="shipments()" placeholder="Select dispatched shipment" /></gw-form-field>
+      <gw-button variant="primary" leadingIcon="Plus" [loading]="busy()" [disabled]="!shipments().length" (click)="createFromShipment()">Create invoice</gw-button>
+    </div>
+  </gw-card>
+
+  @if (aging(); as ar) {
+    <p class="muted mb-2">AR aging · outstanding ₹{{ ar.totalOutstanding }}</p>
+    <div class="aging">
+      <gw-card padding="lg"><p class="muted">Current</p><h2 style="margin:4px 0">₹{{ ar.buckets.current }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">31–60d</p><h2 style="margin:4px 0">₹{{ ar.buckets.d31_60 }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">61–90d</p><h2 style="margin:4px 0">₹{{ ar.buckets.d61_90 }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">90d+</p><h2 style="margin:4px 0">₹{{ ar.buckets.d90plus }}</h2></gw-card>
+    </div>
+    @if (ar.invoices.length) {
+      <gw-card padding="none" class="mb-4"><gw-table [columns]="agingCols" [data]="ar.invoices" /></gw-card>
+    }
+  }
+
+  <p class="muted mb-2">All invoices</p>
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No invoices yet" />
+  </gw-card>
+</div>

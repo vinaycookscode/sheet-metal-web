@@ -1,0 +1,47 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Customers</h1>
+      <p class="muted">{{ rows().length }} records</p>
+    </div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="toggleForm()">New customer</gw-button>
+  </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      <form [formGroup]="form" (ngSubmit)="create()" class="form-grid">
+        <gw-form-field label="Code" [required]="true">
+          <gw-input formControlName="code" placeholder="CUST-010" />
+        </gw-form-field>
+        <gw-form-field label="Name" [required]="true">
+          <gw-input formControlName="name" placeholder="Acme Pvt Ltd" />
+        </gw-form-field>
+        <gw-form-field label="GSTIN">
+          <gw-input formControlName="gstin" placeholder="27AAAAA0000A1Z5" />
+        </gw-form-field>
+        <gw-form-field label="State code">
+          <gw-input formControlName="stateCode" placeholder="27" />
+        </gw-form-field>
+        <gw-form-field label="Payment terms (days)">
+          <gw-input type="number" formControlName="paymentTermsDays" />
+        </gw-form-field>
+        <gw-form-field label="Credit limit (₹)">
+          <gw-input type="number" formControlName="creditLimit" />
+        </gw-form-field>
+
+        @if (error()) {
+          <gw-alert class="field--full" variant="danger" [title]="error()" />
+        }
+
+        <div class="form-actions field--full">
+          <gw-button variant="ghost" type="button" (click)="toggleForm()">Cancel</gw-button>
+          <gw-button variant="primary" type="submit" [loading]="saving()">Save customer</gw-button>
+        </div>
+      </form>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" emptyText="No customers yet" />
+  </gw-card>
+</div>

@@ -1,0 +1,234 @@
+// ─────────────────────────────────────────────────────────────
+// GotWell Design Tokens — enterprise refresh
+// Linear / Stripe / Vercel inspired: Inter typography, refined
+// indigo-blue, hairline borders, ring-based shadows.
+// ─────────────────────────────────────────────────────────────
+
+// ── SCSS Variables (for use inside component SCSS files) ──
+
+// Brand — refined enterprise blue
+$color-primary:        #2563EB;
+$color-primary-hover:  #1D4ED8;
+$color-primary-active: #1E3A8A;
+
+// Semantic — slightly desaturated vs the iOS originals
+$color-success: #16A34A;
+$color-warning: #D97706;
+$color-danger:  #DC2626;
+$color-info:    #0EA5E9;
+$color-purple:  #7C3AED;
+
+// Surfaces — calmer neutrals
+$surface-page:    #FAFAFA;
+$surface-card:    #FFFFFF;
+$surface-input:   #F4F4F5;
+$surface-sidebar: #FFFFFF;
+
+// Text — true near-black on top, walked-down neutrals
+$text-primary:   #09090B;
+$text-secondary: #52525B;
+$text-tertiary:  #A1A1AA;
+$text-inverse:   #FFFFFF;
+
+// Border — hairlines
+$border-color:  #E4E4E7;
+$border-strong: #D4D4D8;
+
+// Spacing — unchanged
+$sp-1:  4px;   $sp-2:  8px;   $sp-3:  12px;  $sp-4:  16px;
+$sp-5:  20px;  $sp-6:  24px;  $sp-8:  32px;  $sp-10: 40px;
+$sp-12: 48px;  $sp-16: 64px;  $sp-20: 80px;
+
+// Radius — collapsed onto --radius-xs (4px). Everything tiles to 4px,
+// container surfaces (lg / xl) ease up only slightly. This is the
+// sharpest enterprise look we can ship and still keep round avatars.
+$radius-xs: 4px;   $radius-sm: 4px;   $radius-md: 4px;
+$radius-lg: 6px;   $radius-xl: 8px;   $radius-2xl: 12px;
+$radius-full: 9999px;
+
+// Typography — Inter, tighter base
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+              Roboto, Helvetica, Arial, sans-serif;
+$font-mono:   'JetBrains Mono', 'SF Mono', 'Fira Code', Consolas, monospace;
+
+$text-xs:   11px;  $text-sm:  12px;  $text-base: 13px;
+$text-md:   14px;  $text-lg:  16px;  $text-xl:   18px;
+$text-2xl:  22px;  $text-3xl: 28px;  $text-4xl:  40px;
+
+// Layout
+$sidebar-width: 248px;
+$topbar-height: 56px;
+
+// Transitions
+$t-fast: 120ms;
+$t-base: 200ms;
+$t-slow: 320ms;
+$ease:        cubic-bezier(0.4, 0, 0.2, 1);
+$ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+$ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+
+// ── CSS Custom Properties (runtime theming) ──
+:root {
+  // Brand
+  --color-primary:        #{$color-primary};
+  --color-primary-hover:  #{$color-primary-hover};
+  --color-primary-active: #{$color-primary-active};
+  --color-primary-subtle: rgba(37, 99, 235, 0.08);
+  --color-primary-light:  rgba(37, 99, 235, 0.14);
+
+  // Semantic
+  --color-success:        #{$color-success};
+  --color-success-subtle: rgba(22, 163, 74, 0.10);
+  --color-warning:        #{$color-warning};
+  --color-warning-subtle: rgba(217, 119, 6, 0.10);
+  --color-danger:         #{$color-danger};
+  --color-danger-subtle:  rgba(220, 38, 38, 0.10);
+  --color-purple:         #{$color-purple};
+  --color-purple-subtle:  rgba(124, 58, 237, 0.10);
+  --color-teal:           #{$color-info};
+  --color-teal-subtle:    rgba(14, 165, 233, 0.10);
+
+  // Surfaces
+  --surface-page:     #{$surface-page};
+  --surface-card:     #ffffff;
+  --surface-sidebar:  rgba(255, 255, 255, 0.92);
+  --surface-topbar:   rgba(255, 255, 255, 0.88);
+  --surface-input:    #{$surface-input};
+  --surface-overlay:  rgba(9, 9, 11, 0.42);
+  --bg-card:          var(--surface-card);
+  --bg-page:          #{$surface-page};
+  --bg-hover:         rgba(9, 9, 11, 0.04);
+  --bg-input:         #ffffff;
+
+  // Text
+  --text-primary:   #{$text-primary};
+  --text-secondary: #{$text-secondary};
+  --text-tertiary:  #{$text-tertiary};
+  --text-disabled:  #D4D4D8;
+  --text-inverse:   #{$text-inverse};
+
+  // Border
+  --border:        #{$border-color};
+  --border-strong: #{$border-strong};
+  --border-focus:  #{$color-primary};
+
+  // Spacing
+  --sp-1: #{$sp-1};   --sp-2: #{$sp-2};   --sp-3: #{$sp-3};
+  --sp-4: #{$sp-4};   --sp-5: #{$sp-5};   --sp-6: #{$sp-6};
+  --sp-8: #{$sp-8};   --sp-10: #{$sp-10}; --sp-12: #{$sp-12};
+  --sp-16: #{$sp-16}; --sp-20: #{$sp-20};
+
+  // Radius
+  --radius-xs:   #{$radius-xs};  --radius-sm:  #{$radius-sm};
+  --radius-md:   #{$radius-md};  --radius-lg:  #{$radius-lg};
+  --radius-xl:   #{$radius-xl};  --radius-2xl: #{$radius-2xl};
+  --radius-full: #{$radius-full};
+
+  // Shadows — restrained ring + soft glow. Heaviest tier reserved for
+  // dialogs/drawers/popovers. Day-to-day cards stay closer to a hairline.
+  --shadow-xs: 0 0 0 1px rgba(9, 9, 11, 0.04);
+  --shadow-sm: 0 0 0 1px rgba(9, 9, 11, 0.05),
+               0 1px 2px rgba(9, 9, 11, 0.04);
+  --shadow-md: 0 0 0 1px rgba(9, 9, 11, 0.05),
+               0 2px 4px rgba(9, 9, 11, 0.05),
+               0 4px 8px rgba(9, 9, 11, 0.04);
+  --shadow-lg: 0 0 0 1px rgba(9, 9, 11, 0.06),
+               0 4px 8px rgba(9, 9, 11, 0.06),
+               0 12px 24px rgba(9, 9, 11, 0.06);
+  --shadow-xl: 0 0 0 1px rgba(9, 9, 11, 0.06),
+               0 8px 16px rgba(9, 9, 11, 0.08),
+               0 24px 48px rgba(9, 9, 11, 0.10);
+  // Focus: tight 2 px ring at low opacity. Not a halo.
+  --shadow-focus: 0 0 0 2px rgba(37, 99, 235, 0.20);
+  --shadow-card-hover: 0 0 0 1px rgba(9, 9, 11, 0.07),
+                      0 4px 12px rgba(9, 9, 11, 0.08),
+                      0 12px 32px rgba(9, 9, 11, 0.08);
+
+  // Typography
+  --font-family: #{$font-family};
+  --font-mono:   #{$font-mono};
+
+  // Layout
+  --sidebar-width: #{$sidebar-width};
+  --topbar-height: #{$topbar-height};
+
+  // Transitions
+  --t-fast: #{$t-fast};
+  --t-base: #{$t-base};
+  --t-slow: #{$t-slow};
+
+  // Z-index
+  --z-dropdown: 200;
+  --z-sticky:   300;
+  --z-sidebar:  400;
+  --z-topbar:   500;
+  --z-modal:    600;
+  --z-toast:    700;
+}
+
+// ── Dark theme ────────────────────────────────────────────────────────────
+// Activate by setting `data-theme="dark"` on <html> or a wrapping container.
+
+:root[data-theme='dark'],
+[data-theme='dark'] {
+  // Brand — slightly lifted for dark surface contrast
+  --color-primary:        #3B82F6;
+  --color-primary-hover:  #60A5FA;
+  --color-primary-active: #2563EB;
+  --color-primary-subtle: rgba(59, 130, 246, 0.14);
+  --color-primary-light:  rgba(59, 130, 246, 0.22);
+
+  // Semantic
+  --color-success:        #22C55E;
+  --color-success-subtle: rgba(34, 197, 94, 0.16);
+  --color-warning:        #F59E0B;
+  --color-warning-subtle: rgba(245, 158, 11, 0.16);
+  --color-danger:         #EF4444;
+  --color-danger-subtle:  rgba(239, 68, 68, 0.16);
+  --color-purple:         #A78BFA;
+  --color-purple-subtle:  rgba(167, 139, 250, 0.16);
+  --color-teal:           #38BDF8;
+  --color-teal-subtle:    rgba(56, 189, 248, 0.16);
+
+  // Surfaces
+  --surface-page:    #09090B;
+  --surface-card:    #18181B;
+  --surface-sidebar: rgba(24, 24, 27, 0.92);
+  --surface-topbar:  rgba(24, 24, 27, 0.92);
+  --surface-input:   #1F1F23;
+  --surface-overlay: rgba(0, 0, 0, 0.66);
+  --bg-card:         var(--surface-card);
+  --bg-page:         var(--surface-page);
+  --bg-hover:        rgba(255, 255, 255, 0.05);
+  --bg-input:        #18181B;
+
+  // Text
+  --text-primary:    #FAFAFA;
+  --text-secondary:  #A1A1AA;
+  --text-tertiary:   #71717A;
+  --text-disabled:   #52525B;
+  --text-inverse:    #09090B;
+
+  // Border
+  --border:        #27272A;
+  --border-strong: #3F3F46;
+  --border-focus:  var(--color-primary);
+
+  // Shadows — dark needs heavier opacity to register
+  --shadow-xs: 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.04),
+               0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 0 0 1px rgba(255, 255, 255, 0.05),
+               0 2px 4px rgba(0, 0, 0, 0.32),
+               0 4px 8px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.05),
+               0 4px 8px rgba(0, 0, 0, 0.34),
+               0 12px 24px rgba(0, 0, 0, 0.36);
+  --shadow-xl: 0 0 0 1px rgba(255, 255, 255, 0.06),
+               0 8px 16px rgba(0, 0, 0, 0.40),
+               0 24px 48px rgba(0, 0, 0, 0.50);
+  --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.26);
+  --shadow-card-hover: 0 0 0 1px rgba(255, 255, 255, 0.06),
+                      0 4px 12px rgba(0, 0, 0, 0.36),
+                      0 12px 32px rgba(0, 0, 0, 0.38);
+}

@@ -1,0 +1,26 @@
+<button class="gw-button"
+        [type]="type"
+        [disabled]="disabled || loading"
+        [attr.aria-busy]="loading || null"
+        [class.gw-button--primary]="variant === 'primary'"
+        [class.gw-button--secondary]="variant === 'secondary'"
+        [class.gw-button--ghost]="variant === 'ghost'"
+        [class.gw-button--danger]="variant === 'danger'"
+        [class.gw-button--subtle]="variant === 'subtle'"
+        [class.gw-button--sm]="size === 'sm'"
+        [class.gw-button--lg]="size === 'lg'"
+        [class.gw-button--block]="block"
+        [class.gw-button--loading]="loading">
+
+  @if (loading) {
+    <span class="gw-button__spinner" aria-hidden="true"></span>
+  } @else if (leadingIcon) {
+    <lucide-icon class="gw-button__icon gw-button__icon--leading" [name]="leadingIcon" [size]="14" />
+  }
+
+  <span class="gw-button__label"><ng-content></ng-content></span>
+
+  @if (trailingIcon && !loading) {
+    <lucide-icon class="gw-button__icon gw-button__icon--trailing" [name]="trailingIcon" [size]="14" />
+  }
+</button>

@@ -1,0 +1,34 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Overview</h1>
+      <p class="muted">Quote-to-cash pipeline at a glance</p>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    @for (k of kpis(); track k.label) {
+      <gw-stat-card [label]="k.label" [value]="k.value" [icon]="k.icon" [loading]="loading()" />
+    }
+  </div>
+
+  <div class="chart-grid">
+    <gw-card padding="lg">
+      <p class="chart-title">Pipeline volume</p>
+      <app-bar-chart [data]="pipeline()" />
+    </gw-card>
+    <gw-card padding="lg">
+      <p class="chart-title">Sales orders by status</p>
+      <app-donut-chart [data]="soStatus()" />
+    </gw-card>
+    <gw-card padding="lg">
+      <p class="chart-title">Top stock on-hand</p>
+      <app-bar-chart [data]="stockBars()" color="#16A34A" />
+    </gw-card>
+  </div>
+
+  <p class="muted mb-2">Recent sales orders</p>
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="recent()" [loading]="loading()" (rowClick)="open($event)" emptyText="No sales orders yet" />
+  </gw-card>
+</div>

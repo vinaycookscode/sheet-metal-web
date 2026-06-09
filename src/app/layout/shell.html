@@ -1,0 +1,20 @@
+<div class="app-shell">
+  <gw-top-nav class="app-topbar" [sticky]="true">
+    <div gw-top-nav-brand class="sm-brand">
+      <div class="sm-brand__logo">SM</div>
+      <span class="sm-brand__name">Sheet Metal ERP</span>
+    </div>
+    <div gw-top-nav-right class="sm-topbar-right">
+      <span class="sm-topbar-user">{{ user()?.fullName }}</span>
+      <gw-button variant="ghost" size="sm" leadingIcon="LogOut" (click)="logout()">Logout</gw-button>
+    </div>
+  </gw-top-nav>
+
+  <gw-sidebar class="app-sidebar" [sections]="sections" [activeKey]="activeKey()">
+    <div gw-sidebar-brand class="sm-sb-brand">Pune Plant · PLANT1</div>
+  </gw-sidebar>
+
+  <main class="app-content">
+    <router-outlet />
+  </main>
+</div>

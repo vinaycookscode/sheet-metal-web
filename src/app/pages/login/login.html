@@ -1,0 +1,29 @@
+<div class="login">
+  <gw-card class="login__card" elevation="md" padding="lg">
+    <div class="login__brand">
+      <div class="login__logo">SM</div>
+      <h1>Sheet Metal ERP</h1>
+      <p class="login__sub">Sign in to your account</p>
+    </div>
+
+    @if (error()) {
+      <gw-alert variant="danger" [title]="error()" />
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="login__form">
+      <gw-form-field label="Email" [required]="true">
+        <gw-input type="email" formControlName="email" placeholder="you@company.com" autocomplete="email" />
+      </gw-form-field>
+      <gw-form-field label="Password" [required]="true">
+        <gw-password-input formControlName="password" placeholder="••••••••" />
+      </gw-form-field>
+      <gw-button type="submit" variant="primary" [block]="true" [loading]="loading()">Sign in</gw-button>
+    </form>
+
+    <div class="login__demo">
+      <span>Demo:</span>
+      <gw-button variant="ghost" size="sm" (click)="demo('admin')">Admin</gw-button>
+      <gw-button variant="ghost" size="sm" (click)="demo('sales')">Sales</gw-button>
+    </div>
+  </gw-card>
+</div>

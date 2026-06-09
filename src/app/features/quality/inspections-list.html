@@ -1,0 +1,41 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Inspections</h1>
+      <p class="muted">{{ rows().length }} records</p>
+    </div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="toggleForm()">New inspection</gw-button>
+  </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      <form [formGroup]="form" (ngSubmit)="create()">
+        <gw-form-field label="Kind" [required]="true">
+          <gw-select formControlName="kind" [options]="kinds" />
+        </gw-form-field>
+        <p class="muted mt-3 mb-2">Characteristics</p>
+        <div formArrayName="characteristics">
+          @for (c of characteristics.controls; track c; let i = $index) {
+            <div class="char-row" [formGroupName]="i">
+              <gw-input formControlName="characteristic" placeholder="e.g. Length" />
+              <gw-input type="number" formControlName="nominal" placeholder="Nominal" />
+              <gw-input type="number" formControlName="tolerancePlus" placeholder="Tol +" />
+              <gw-input type="number" formControlName="toleranceMinus" placeholder="Tol −" />
+              <gw-icon-button icon="Trash2" ariaLabel="Remove" variant="ghost" (click)="removeChar(i)" />
+            </div>
+          }
+        </div>
+        <gw-button variant="ghost" size="sm" leadingIcon="Plus" type="button" (click)="addChar()">Add characteristic</gw-button>
+        @if (error()) { <gw-alert class="mt-3" variant="danger" [title]="error()" /> }
+        <div class="form-actions mt-4">
+          <gw-button variant="ghost" type="button" (click)="toggleForm()">Cancel</gw-button>
+          <gw-button variant="primary" type="submit" [loading]="saving()">Create &amp; record</gw-button>
+        </div>
+      </form>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No inspections yet" />
+  </gw-card>
+</div>

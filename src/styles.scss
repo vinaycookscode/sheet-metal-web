@@ -1,0 +1,186 @@
+// ── GotWell Global Styles ──
+// Import order matters: tokens first (variables), then reset, then typography,
+// then animations (keyframes), then component classes.
+
+@use 'styles/tokens';       // CSS custom properties + SCSS vars
+@use 'styles/reset';        // Box-model and browser defaults reset
+@use 'styles/typography';   // Body, headings, text utility classes
+@use 'styles/animations';   // @keyframes + animation utilities
+@use 'styles/components';   // Reusable UI classes (btn, card, badge, modal…)
+@use 'app/shared/ui/overlays/tooltip/tooltip.styles'; // body-appended tooltip
+@use 'app/shared/ui/feedback/toast/toast.styles';     // body-appended toast stack
+
+// ── Layout scaffold ──
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--topbar-height) 1fr;
+  min-height: 100vh;
+  background: var(--surface-page);
+  position: relative;
+  z-index: 1;
+
+  .app-topbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    position: sticky;
+    top: 0;
+    z-index: var(--z-topbar);
+    height: var(--topbar-height);
+    background: var(--surface-topbar);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(0, 122, 255, 0.08);
+  }
+
+  .app-sidebar {
+    grid-column: 1;
+    grid-row: 2;
+    position: sticky;
+    top: var(--topbar-height);
+    height: calc(100vh - var(--topbar-height));
+    overflow-y: auto;
+    background: var(--surface-sidebar);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-right: 1px solid rgba(0, 122, 255, 0.08);
+    z-index: var(--z-sidebar);
+  }
+
+  .app-content {
+    grid-column: 2;
+    grid-row: 2;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  // ── Tablet: collapse sidebar to icons only ──
+  @media (max-width: 1024px) {
+    grid-template-columns: 60px 1fr;
+
+    .app-sidebar {
+      overflow: visible;
+    }
+  }
+
+  // ── Mobile: stack topbar + content, hide sidebar ──
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--topbar-height) 1fr auto;
+
+    .app-topbar { grid-column: 1; }
+
+    .app-sidebar {
+      grid-column: 1;
+      grid-row: 3;
+      height: auto;
+      position: sticky;
+      bottom: 0;
+      top: auto;
+      border-right: none;
+      border-top: 1px solid var(--border);
+      z-index: var(--z-topbar);
+    }
+
+    .app-content {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+}
+
+// ── Responsive page padding ──
+@media (max-width: 768px) {
+  .page { padding: 16px; }
+  .page-header { gap: 12px; }
+  .inv-summary { grid-template-columns: 1fr !important; }
+  .branch-grid { grid-template-columns: 1fr !important; }
+  .form-grid   { grid-template-columns: 1fr !important; }
+  .field--full { grid-column: auto !important; }
+  .tab-bar     { overflow-x: auto; }
+}
+
+@media (max-width: 1024px) {
+  .page { padding: 20px; }
+}
+
+// ── Scrollbar (WebKit) ──
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 99px;
+  &:hover { background: var(--text-tertiary); }
+}
+
+// ── Focus outline: only keyboard nav shows the ring ──
+:focus        { outline: none; }
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+// ── Utility: spacing ──
+.mt-0 { margin-top: 0; }           .mb-0 { margin-bottom: 0; }
+.mt-1 { margin-top: var(--sp-1); } .mb-1 { margin-bottom: var(--sp-1); }
+.mt-2 { margin-top: var(--sp-2); } .mb-2 { margin-bottom: var(--sp-2); }
+.mt-3 { margin-top: var(--sp-3); } .mb-3 { margin-bottom: var(--sp-3); }
+.mt-4 { margin-top: var(--sp-4); } .mb-4 { margin-bottom: var(--sp-4); }
+.mt-6 { margin-top: var(--sp-6); } .mb-6 { margin-bottom: var(--sp-6); }
+.mt-8 { margin-top: var(--sp-8); } .mb-8 { margin-bottom: var(--sp-8); }
+
+.gap-1 { gap: var(--sp-1); } .gap-2 { gap: var(--sp-2); }
+.gap-3 { gap: var(--sp-3); } .gap-4 { gap: var(--sp-4); }
+.gap-6 { gap: var(--sp-6); } .gap-8 { gap: var(--sp-8); }
+
+// ── Utility: display ──
+.d-flex    { display: flex; }
+.d-grid    { display: grid; }
+.d-block   { display: block; }
+.d-none    { display: none; }
+.flex-col  { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center    { align-items: center; }
+.items-start     { align-items: flex-start; }
+.items-end       { align-items: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-center  { justify-content: center; }
+.justify-end     { justify-content: flex-end; }
+.flex-1   { flex: 1; }
+.shrink-0 { flex-shrink: 0; }
+
+// ── Utility: sizing ──
+.w-full  { width: 100%; }
+.h-full  { height: 100%; }
+.min-w-0 { min-width: 0; }
+
+// ── Utility: overflow ──
+.overflow-hidden { overflow: hidden; }
+.overflow-auto   { overflow: auto; }
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── App-specific layout (sheet-metal) ──
+.page { padding: 28px 32px; max-width: 1200px; }
+.page-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+  h1 { font-size: 22px; margin: 0; }
+}
+.muted { color: var(--text-secondary); font-size: 13px; margin: 2px 0 0; }
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.form-grid .field--full { grid-column: 1 / -1; }
+.form-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+// top-nav brand + right
+.sm-brand { display: flex; align-items: center; gap: 10px; }
+.sm-brand__logo {
+  width: 30px; height: 30px; border-radius: 8px; background: var(--color-primary, #2563EB);
+  color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px;
+}
+.sm-brand__name { font-weight: 600; }
+.sm-topbar-right { display: flex; align-items: center; gap: 14px; }
+.sm-topbar-user { font-size: 13px; color: var(--text-secondary); }
+.sm-sb-brand { padding: 14px 16px; font-size: 12px; color: var(--text-secondary); }

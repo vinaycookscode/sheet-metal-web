@@ -1,0 +1,11 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Quotes</h1>
+      <p class="muted">{{ rows().length }} records · create from an inquiry</p>
+    </div>
+  </div>
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No quotes yet" />
+  </gw-card>
+</div>

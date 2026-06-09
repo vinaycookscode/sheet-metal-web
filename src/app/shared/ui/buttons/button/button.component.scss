@@ -1,0 +1,100 @@
+// Host disappears from layout so the inner <button> behaves as a real
+// form submit button. Required for type="submit" inside <form>.
+:host { display: contents; }
+
+.gw-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color var(--t-fast) ease,
+              border-color var(--t-fast) ease,
+              color var(--t-fast) ease,
+              box-shadow var(--t-fast) ease,
+              transform var(--t-fast) ease;
+
+  &:focus-visible { box-shadow: var(--shadow-focus); outline: none; }
+  &:active:not(:disabled) { transform: translateY(0.5px); }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  // Sizes
+  &--sm { height: 28px; padding: 0 10px; font-size: 12px; }
+  &--lg { height: 44px; padding: 0 18px; font-size: 14px; }
+  &--block { display: flex; width: 100%; }
+
+  // Variants
+  &--primary {
+    background: var(--color-primary);
+    color: var(--text-inverse);
+    &:hover:not(:disabled) { background: var(--color-primary-hover); }
+    &:active:not(:disabled) { background: var(--color-primary-active); }
+  }
+
+  &--secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border);
+    &:hover:not(:disabled) { background: var(--surface-input); border-color: var(--border-strong); }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    &:hover:not(:disabled) { background: var(--surface-input); color: var(--text-primary); }
+  }
+
+  &--subtle {
+    background: var(--color-primary-subtle);
+    color: var(--color-primary);
+    &:hover:not(:disabled) { background: var(--color-primary-light); }
+  }
+
+  &--danger {
+    background: var(--color-danger);
+    color: var(--text-inverse);
+    &:hover:not(:disabled) { background: #b91c1c; }
+  }
+
+  &--loading .gw-button__label { opacity: 0.6; }
+}
+
+.gw-button__icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+.gw-button__spinner {
+  width: 14px; height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: gw-button-spin 0.7s linear infinite;
+}
+
+@keyframes gw-button-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gw-button__spinner { animation: none; }
+}

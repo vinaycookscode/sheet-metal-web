@@ -1,0 +1,41 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Shipments</h1>
+      <p class="muted">{{ rows().length }} delivery challans</p>
+    </div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="toggleForm()">New shipment</gw-button>
+  </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      <div class="d-flex items-center gap-2" style="max-width:520px">
+        <gw-form-field label="Sales order" [required]="true" style="flex:1">
+          <gw-select [formControl]="soControl" [options]="soOptions()" placeholder="Select order to ship" />
+        </gw-form-field>
+        <gw-button variant="ghost" (click)="loadLines()">Load lines</gw-button>
+      </div>
+
+      @if (lineMeta().length) {
+        <p class="muted mt-3 mb-2">Pack lines</p>
+        @for (g of packs.controls; track g; let i = $index) {
+          <div class="pack-row" [formGroup]="$any(g)">
+            <gw-checkbox formControlName="include" />
+            <span>{{ lineMeta()[i].label }}</span>
+            <gw-input type="number" formControlName="qty" placeholder="Qty" />
+            <gw-input type="number" formControlName="weightKg" placeholder="Weight kg" />
+          </div>
+        }
+      }
+      @if (error()) { <gw-alert class="mt-3" variant="danger" [title]="error()" /> }
+      <div class="form-actions mt-4">
+        <gw-button variant="ghost" type="button" (click)="toggleForm()">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="saving()" [disabled]="!lineMeta().length" (click)="create()">Create shipment</gw-button>
+      </div>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No shipments yet" />
+  </gw-card>
+</div>

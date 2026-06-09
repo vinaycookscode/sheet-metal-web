@@ -1,0 +1,85 @@
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { InventoryService } from '../../core/inventory.service';
+import { CatalogService } from '../../core/catalog.service';
+import { GwCardComponent } from '../../shared/ui/display/card/card.component';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
+import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
+import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/table.component';
+import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+
+@Component({
+  selector: 'app-stock-page',
+  standalone: true,
+  imports: [ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwInputComponent, GwAlertComponent],
+  templateUrl: './stock-page.html',
+  styles: [`
+    .lot-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border,#eee)}
+    .lot-row:last-child{border-bottom:none}
+    .adjust{display:grid;grid-template-columns:1fr 2fr auto auto;gap:8px;align-items:center;padding:10px;background:var(--surface-input,#f4f4f5);border-radius:8px;margin:6px 0}
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class StockPage implements OnInit {
+  private readonly inv = inject(InventoryService);
+  private readonly catalog = inject(CatalogService);
+  private readonly fb = inject(FormBuilder);
+
+  private itemMap = new Map<string, string>();
+  readonly summaryRows = signal<Array<Record<string, unknown>>>([]);
+  readonly lots = signal<Array<Record<string, unknown>>>([]);
+  readonly ledgerRows = signal<Array<Record<string, unknown>>>([]);
+  readonly loading = signal(false);
+  readonly busy = signal(false);
+  readonly error = signal('');
+  readonly adjustLotId = signal<string | null>(null);
+
+  readonly form = this.fb.nonNullable.group({ qtyDelta: [0], reason: [''] });
+
+  readonly summaryCols: GwTableColumn[] = [
+    { key: 'code', label: 'Item', width: '180px' },
+    { key: 'name', label: 'Name' },
+    { key: 'onHand', label: 'On hand', width: '110px', align: 'right' },
+    { key: 'allocated', label: 'Allocated', width: '110px', align: 'right' },
+    { key: 'available', label: 'Available', width: '110px', align: 'right' },
+  ];
+  readonly ledgerCols: GwTableColumn[] = [
+    { key: 'type', label: 'Type', width: '150px' },
+    { key: 'item', label: 'Item' },
+    { key: 'delta', label: 'Qty Δ', width: '110px', align: 'right' },
+    { key: 'reference', label: 'Reference' },
+  ];
+
+  ngOnInit(): void { this.load(); }
+
+  load(): void {
+    this.loading.set(true);
+    forkJoin({ summary: this.catalog.stockSummary(), lots: this.inv.list(), ledger: this.inv.ledger(), items: this.catalog.items() }).subscribe({
+      next: ({ summary, lots, ledger, items }) => {
+        this.itemMap = new Map(items.map((i) => [i.id, `${i.code} — ${i.name}`]));
+        this.summaryRows.set(summary.map((s) => ({ code: s.code, name: s.name, onHand: s.onHand, allocated: s.allocated, available: s.available })));
+        this.lots.set(lots.map((l) => ({ id: l.id, item: this.itemMap.get(l.itemId) ?? l.itemId, lotNo: l.lotNo ?? '—', location: l.location ?? '—', onHand: l.qtyOnHand, allocated: l.qtyAllocated, isRemnant: l.isRemnant })));
+        this.ledgerRows.set(ledger.slice(0, 50).map((t) => ({ type: t.txn_type, item: this.itemMap.get(t.item_id) ?? t.item_id, delta: t.qty_delta, reference: t.reference ?? '—' })));
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
+  }
+
+  startAdjust(lotId: string): void { this.adjustLotId.set(lotId); this.form.reset({ qtyDelta: 0, reason: '' }); this.error.set(''); }
+
+  confirmAdjust(): void {
+    const lotId = this.adjustLotId();
+    if (!lotId) return;
+    const v = this.form.getRawValue();
+    if (!v.reason) { this.error.set('Reason is required'); return; }
+    this.busy.set(true);
+    this.error.set('');
+    this.inv.adjust({ stockLotId: lotId, qtyDelta: Number(v.qtyDelta), reason: v.reason }).subscribe({
+      next: () => { this.busy.set(false); this.adjustLotId.set(null); this.load(); },
+      error: (e) => { this.busy.set(false); this.error.set(e?.error?.message ?? 'Adjust failed'); },
+    });
+  }
+}

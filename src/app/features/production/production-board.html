@@ -1,0 +1,52 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Production Board</h1>
+      <p class="muted">Active work-order operations by work center</p>
+    </div>
+    <gw-button variant="ghost" leadingIcon="RefreshCw" (click)="load()">Refresh</gw-button>
+  </div>
+
+  @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  @if (loading()) {
+    <p class="muted">Loading…</p>
+  } @else if (!groups().length) {
+    <gw-card padding="lg"><p class="muted">No active operations. Release a work order to populate the board.</p></gw-card>
+  } @else {
+    @for (g of groups(); track g.workCenter) {
+      <gw-card padding="lg" class="mb-4">
+        <div class="d-flex items-center justify-between mb-2">
+          <strong>{{ g.workCenter }}</strong>
+          <span class="muted">{{ g.operations.length }} op(s)</span>
+        </div>
+        @for (op of g.operations; track op.id) {
+          <div class="op-row">
+            <div class="d-flex items-center gap-2">
+              <span><strong>{{ op.wo_number }}</strong> · {{ op.part_no }} · op {{ op.op_no }}</span>
+              @if (op.behind_schedule) { <gw-badge variant="danger">behind</gw-badge> }
+            </div>
+            <div class="d-flex items-center gap-2">
+              <gw-badge [variant]="$any(opVariant(op.op_status))">{{ op.op_status }}</gw-badge>
+              @if (op.op_status === 'queued') {
+                <gw-button size="sm" variant="secondary" (click)="clockOn(op.id)">Clock on</gw-button>
+              }
+              @if (op.op_status === 'in_progress') {
+                <gw-button size="sm" variant="primary" (click)="startClockOff(op.id)">Clock off</gw-button>
+              }
+            </div>
+          </div>
+          @if (clockOffOpId() === op.id) {
+            <div class="clockoff" [formGroup]="form">
+              <gw-input type="number" formControlName="qtyGood" placeholder="Good qty" />
+              <gw-input type="number" formControlName="qtyScrap" placeholder="Scrap qty" />
+              <gw-input formControlName="scrapReason" placeholder="Scrap reason (if scrap)" />
+              <gw-button size="sm" variant="primary" [loading]="busy()" (click)="confirmClockOff()">Confirm</gw-button>
+              <gw-button size="sm" variant="ghost" (click)="clockOffOpId.set(null)">Cancel</gw-button>
+            </div>
+          }
+        }
+      </gw-card>
+    }
+  }
+</div>

@@ -1,0 +1,58 @@
+<div class="page">
+  <a routerLink="/purchase-orders" class="muted" style="text-decoration:none">← Purchase Orders</a>
+
+  @if (loading()) {
+    <p class="muted mt-3">Loading…</p>
+  } @else if (po(); as p) {
+    <div class="page-header mt-2">
+      <div class="d-flex items-center gap-3">
+        <h1>{{ p.number }}</h1>
+        <gw-badge [variant]="$any(statusVariant(p.status))">{{ label(p.status) }}</gw-badge>
+        <span class="muted">₹ {{ p.grandTotal }}</span>
+      </div>
+      <div class="d-flex gap-2">
+        @if (p.status === 'draft') { <gw-button variant="secondary" [loading]="busy()" (click)="approve()">Approve</gw-button> }
+        @if (p.status === 'approved') { <gw-button variant="secondary" [loading]="busy()" (click)="send()">Send</gw-button> }
+        @if (p.status === 'sent' || p.status === 'acknowledged' || p.status === 'partially_received') {
+          <gw-button variant="primary" leadingIcon="Package" (click)="showReceive.set(!showReceive())">Receive goods</gw-button>
+        }
+      </div>
+    </div>
+
+    @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+    <gw-card padding="lg" class="mb-4">
+      <div class="form-grid">
+        <div><p class="muted">Subtotal</p><p>₹ {{ p.subtotal }}</p></div>
+        <div><p class="muted">Tax</p><p>₹ {{ p.taxTotal }}</p></div>
+        <div><p class="muted">Grand total</p><p><strong>₹ {{ p.grandTotal }}</strong></p></div>
+      </div>
+    </gw-card>
+
+    @if (showReceive()) {
+      <gw-card padding="lg" class="mb-4">
+        <p class="muted mb-2">Receive against PO</p>
+        @for (g of recv.controls; track g; let i = $index) {
+          <div class="recv-row" [formGroup]="$any(g)">
+            <span>{{ lineMeta()[i].item }} <span class="muted">(ordered {{ lineMeta()[i].qty }})</span></span>
+            <gw-input type="number" formControlName="qtyReceived" placeholder="Qty recd" />
+            <gw-input formControlName="heatNo" placeholder="Heat #" />
+            <gw-input formControlName="lotNo" placeholder="Lot #" />
+          </div>
+        }
+        <div class="form-actions mt-3">
+          <gw-button variant="ghost" (click)="showReceive.set(false)">Cancel</gw-button>
+          <gw-button variant="primary" [loading]="busy()" (click)="receive()">Post GRN</gw-button>
+        </div>
+      </gw-card>
+    }
+
+    <p class="muted mb-2">Lines</p>
+    <gw-card padding="none" class="mb-4"><gw-table [columns]="lineCols" [data]="lineRows()" /></gw-card>
+
+    <p class="muted mb-2">Goods receipts</p>
+    <gw-card padding="none"><gw-table [columns]="grnCols" [data]="grnRows()" emptyText="No GRNs yet" /></gw-card>
+  } @else {
+    <gw-alert class="mt-3" variant="danger" title="Purchase order not found" />
+  }
+</div>

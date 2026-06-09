@@ -1,0 +1,56 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>NCRs</h1>
+      <p class="muted">{{ ncrs().length }} non-conformance reports</p>
+    </div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="toggleForm()">Raise NCR</gw-button>
+  </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      <form [formGroup]="form" (ngSubmit)="create()">
+        <div class="form-grid">
+          <gw-form-field label="Source" [required]="true"><gw-select formControlName="source" [options]="sources" /></gw-form-field>
+          <gw-form-field label="Supplier (if incoming)"><gw-select formControlName="supplierId" [options]="suppliers()" placeholder="—" /></gw-form-field>
+          <gw-form-field label="Defect" [required]="true" class="field--full"><gw-input formControlName="defect" placeholder="Describe the non-conformance" /></gw-form-field>
+        </div>
+        <div class="mt-2"><gw-checkbox formControlName="isCritical" label="Critical (blocks dispatch)" /></div>
+        @if (error()) { <gw-alert class="mt-3" variant="danger" [title]="error()" /> }
+        <div class="form-actions mt-4">
+          <gw-button variant="ghost" type="button" (click)="toggleForm()">Cancel</gw-button>
+          <gw-button variant="primary" type="submit" [loading]="saving()">Raise NCR</gw-button>
+        </div>
+      </form>
+    </gw-card>
+  }
+
+  @if (error() && !showForm()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  <gw-card padding="lg">
+    @if (loading()) { <p class="muted">Loading…</p> }
+    @if (!loading() && !ncrs().length) { <p class="muted">No NCRs</p> }
+    @for (n of ncrs(); track n.id) {
+      <div class="ncr-row">
+        <div class="d-flex items-center gap-2">
+          <strong>{{ n.number }}</strong>
+          @if (n.isCritical) { <gw-badge variant="danger">critical</gw-badge> }
+          <span>{{ n.defect }}</span>
+        </div>
+        <div class="d-flex items-center gap-2">
+          <gw-badge variant="neutral">{{ n.disposition }}</gw-badge>
+          <gw-badge [variant]="$any(statusVariant(n.status))">{{ n.status }}</gw-badge>
+          @if (n.status === 'open') { <gw-button size="sm" variant="secondary" [disabled]="busy()" (click)="startDispo(n.id)">Disposition</gw-button> }
+          @if (n.status !== 'closed' && n.disposition !== 'pending') { <gw-button size="sm" variant="ghost" [disabled]="busy()" (click)="close(n.id)">Close</gw-button> }
+        </div>
+      </div>
+      @if (dispoNcrId() === n.id) {
+        <div class="dispo">
+          <gw-select [formControl]="dispoControl" [options]="dispositions" placeholder="Disposition" />
+          <gw-button size="sm" variant="primary" [loading]="busy()" (click)="confirmDispo()">Apply</gw-button>
+          <gw-button size="sm" variant="ghost" (click)="dispoNcrId.set(null)">Cancel</gw-button>
+        </div>
+      }
+    }
+  </gw-card>
+</div>

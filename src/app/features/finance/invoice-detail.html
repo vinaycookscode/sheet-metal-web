@@ -1,0 +1,47 @@
+<div class="page">
+  <a routerLink="/invoices" class="muted" style="text-decoration:none">← Invoices</a>
+
+  @if (loading()) {
+    <p class="muted mt-3">Loading…</p>
+  } @else if (inv(); as i) {
+    <div class="page-header mt-2">
+      <div class="d-flex items-center gap-3">
+        <h1>{{ i.number }}</h1>
+        <gw-badge [variant]="$any(statusVariant(i.status))">{{ label(i.status) }}</gw-badge>
+        <span class="muted">{{ label(i.gstTreatment) }}</span>
+      </div>
+      <div class="d-flex gap-2">
+        @if (i.status === 'draft') { <gw-button variant="secondary" [loading]="busy()" (click)="issue()">Issue</gw-button> }
+        @if (i.status === 'issued' || i.status === 'partially_paid') { <gw-button variant="primary" leadingIcon="IndianRupee" (click)="showPay.set(!showPay())">Record payment</gw-button> }
+      </div>
+    </div>
+
+    @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+    <gw-card padding="lg" class="mb-4">
+      <div class="form-grid">
+        <div><p class="muted">Subtotal</p><p>₹ {{ i.subtotal }}</p></div>
+        <div><p class="muted">CGST / SGST</p><p>₹ {{ i.cgst }} / ₹ {{ i.sgst }}</p></div>
+        <div><p class="muted">IGST</p><p>₹ {{ i.igst }}</p></div>
+        <div><p class="muted">Grand total</p><p><strong>₹ {{ i.grandTotal }}</strong></p></div>
+        <div><p class="muted">Paid</p><p>₹ {{ i.amountPaid }}</p></div>
+        <div><p class="muted">Balance</p><p>₹ {{ i.grandTotal - i.amountPaid }}</p></div>
+      </div>
+    </gw-card>
+
+    @if (showPay()) {
+      <gw-card padding="lg" class="mb-4">
+        <div class="d-flex gap-2 items-end" [formGroup]="payForm">
+          <gw-form-field label="Amount ₹"><gw-input type="number" formControlName="amount" /></gw-form-field>
+          <gw-form-field label="Method"><gw-input formControlName="method" placeholder="neft" /></gw-form-field>
+          <gw-button variant="primary" [loading]="busy()" (click)="pay()">Save payment</gw-button>
+        </div>
+      </gw-card>
+    }
+
+    <p class="muted mb-2">Lines</p>
+    <gw-card padding="none"><gw-table [columns]="lineCols" [data]="i.lines ?? []" /></gw-card>
+  } @else {
+    <gw-alert class="mt-3" variant="danger" title="Invoice not found" />
+  }
+</div>

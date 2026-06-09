@@ -1,0 +1,52 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Inquiries</h1>
+      <p class="muted">{{ rows().length }} records</p>
+    </div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="toggleForm()">New inquiry</gw-button>
+  </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      <form [formGroup]="form" (ngSubmit)="create()">
+        <div class="form-grid">
+          <gw-form-field label="Customer" [required]="true">
+            <gw-select formControlName="customerId" [options]="customerOptions()" placeholder="Select customer" />
+          </gw-form-field>
+          <gw-form-field label="Required date">
+            <gw-date-input formControlName="requiredDate" />
+          </gw-form-field>
+          <gw-form-field label="Notes" class="field--full">
+            <gw-input formControlName="notes" placeholder="Optional notes" />
+          </gw-form-field>
+        </div>
+
+        <p class="muted mt-3 mb-2">Lines</p>
+        <div formArrayName="lines">
+          @for (line of lines.controls; track line; let i = $index) {
+            <div class="line-row" [formGroupName]="i">
+              <gw-input formControlName="partName" placeholder="Part name" />
+              <gw-input type="number" formControlName="qty" placeholder="Qty" />
+              <gw-input type="number" formControlName="targetPrice" placeholder="Target ₹" />
+              <gw-icon-button icon="Trash2" ariaLabel="Remove line" variant="ghost" (click)="removeLine(i)" />
+            </div>
+          }
+        </div>
+        <gw-button variant="ghost" size="sm" leadingIcon="Plus" type="button" (click)="addLine()">Add line</gw-button>
+
+        @if (error()) {
+          <gw-alert class="mt-3" variant="danger" [title]="error()" />
+        }
+        <div class="form-actions mt-4">
+          <gw-button variant="ghost" type="button" (click)="toggleForm()">Cancel</gw-button>
+          <gw-button variant="primary" type="submit" [loading]="saving()">Create inquiry</gw-button>
+        </div>
+      </form>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No inquiries yet" />
+  </gw-card>
+</div>

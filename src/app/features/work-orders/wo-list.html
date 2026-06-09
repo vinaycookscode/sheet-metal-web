@@ -1,0 +1,16 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Work Orders</h1>
+      <p class="muted">{{ rows().length }} records</p>
+    </div>
+    <gw-button variant="primary" leadingIcon="RefreshCw" [loading]="running()" (click)="runMrp()">Run MRP</gw-button>
+  </div>
+
+  @if (mrpMsg()) { <gw-alert class="mb-4" variant="success" [title]="mrpMsg()" /> }
+  @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No work orders — run MRP on released SO lines" />
+  </gw-card>
+</div>

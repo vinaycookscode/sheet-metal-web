@@ -1,0 +1,39 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Purchase Orders</h1>
+      <p class="muted">{{ rows().length }} POs · {{ openReqs().length }} open requisition(s)</p>
+    </div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="toggleForm()" [disabled]="!openReqs().length">Create PO from requisitions</gw-button>
+  </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      @if (!openReqs().length) {
+        <p class="muted">No open requisitions. Run MRP to generate purchase requisitions.</p>
+      } @else {
+        <gw-form-field label="Supplier" [required]="true">
+          <gw-select [formControl]="supplierControl" [options]="suppliers()" placeholder="Select supplier" />
+        </gw-form-field>
+        <p class="muted mt-3 mb-2">Requisitions</p>
+        @for (g of reqs.controls; track g; let i = $index) {
+          <div class="req-row" [formGroup]="$any(g)">
+            <gw-checkbox formControlName="include" />
+            <span>{{ openReqs()[i].item }}</span>
+            <span class="muted">qty {{ openReqs()[i].qty }}</span>
+            <gw-input type="number" formControlName="unitPrice" placeholder="Unit ₹" />
+          </div>
+        }
+      }
+      @if (error()) { <gw-alert class="mt-3" variant="danger" [title]="error()" /> }
+      <div class="form-actions mt-4">
+        <gw-button variant="ghost" type="button" (click)="toggleForm()">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="saving()" [disabled]="!openReqs().length" (click)="createPo()">Create purchase order</gw-button>
+      </div>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No purchase orders yet" />
+  </gw-card>
+</div>

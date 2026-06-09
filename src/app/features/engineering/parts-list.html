@@ -1,0 +1,58 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Parts</h1>
+      <p class="muted">{{ rows().length }} records</p>
+    </div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="toggleForm()">New part</gw-button>
+  </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      <form [formGroup]="form" (ngSubmit)="create()">
+        <div class="form-grid">
+          <gw-form-field label="Part No" [required]="true"><gw-input formControlName="partNo" placeholder="FG-500" /></gw-form-field>
+          <gw-form-field label="Description"><gw-input formControlName="description" placeholder="Enclosure" /></gw-form-field>
+          <gw-form-field label="Material grade"><gw-select formControlName="materialGradeId" [options]="grades()" placeholder="—" /></gw-form-field>
+          <gw-form-field label="Thickness (mm)"><gw-input type="number" formControlName="thicknessMm" /></gw-form-field>
+          <gw-form-field label="Finish"><gw-select formControlName="finishId" [options]="finishes()" placeholder="—" /></gw-form-field>
+        </div>
+
+        <p class="muted mt-3 mb-2">Routing</p>
+        <div formArrayName="routing">
+          @for (op of routing.controls; track op; let i = $index) {
+            <div class="line-row routing-row" [formGroupName]="i">
+              <gw-select formControlName="operationId" [options]="operations()" placeholder="Operation" />
+              <gw-select formControlName="workCenterId" [options]="workCenters()" placeholder="Work center" />
+              <gw-input type="number" formControlName="runSecondsPerUnit" placeholder="Run s/unit" />
+              <gw-icon-button icon="Trash2" ariaLabel="Remove op" variant="ghost" (click)="removeRouting(i)" />
+            </div>
+          }
+        </div>
+        <gw-button variant="ghost" size="sm" leadingIcon="Plus" type="button" (click)="addRouting()">Add operation</gw-button>
+
+        <p class="muted mt-3 mb-2">Bill of materials</p>
+        <div formArrayName="bom">
+          @for (b of bom.controls; track b; let i = $index) {
+            <div class="line-row bom-row" [formGroupName]="i">
+              <gw-select formControlName="componentItemId" [options]="items()" placeholder="Component item" />
+              <gw-input type="number" formControlName="qtyPer" placeholder="Qty per" />
+              <gw-icon-button icon="Trash2" ariaLabel="Remove component" variant="ghost" (click)="removeBom(i)" />
+            </div>
+          }
+        </div>
+        <gw-button variant="ghost" size="sm" leadingIcon="Plus" type="button" (click)="addBom()">Add component</gw-button>
+
+        @if (error()) { <gw-alert class="mt-3" variant="danger" [title]="error()" /> }
+        <div class="form-actions mt-4">
+          <gw-button variant="ghost" type="button" (click)="toggleForm()">Cancel</gw-button>
+          <gw-button variant="primary" type="submit" [loading]="saving()">Create part</gw-button>
+        </div>
+      </form>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No parts yet" />
+  </gw-card>
+</div>

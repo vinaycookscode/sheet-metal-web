@@ -1,0 +1,29 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Project Closure</h1>
+      <p class="muted">Estimate vs actual &amp; realized margin per sales order</p>
+    </div>
+  </div>
+
+  @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  <gw-card padding="lg" class="mb-4">
+    <div class="d-flex gap-2 items-end" style="max-width:560px">
+      <gw-form-field label="Sales order" style="flex:1"><gw-select [formControl]="soControl" [options]="soOptions()" placeholder="Select a sales order" /></gw-form-field>
+      <gw-button variant="secondary" [loading]="busy()" (click)="view()">View report</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="close()">Close project</gw-button>
+    </div>
+  </gw-card>
+
+  @if (report(); as r) {
+    <p class="muted mb-2">{{ r.salesOrder }} · status {{ r.status }}</p>
+    <div class="totals mb-4">
+      <gw-card padding="lg"><p class="muted">Revenue</p><h2 style="margin:4px 0">₹{{ r.totals.revenue }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">Estimated cost</p><h2 style="margin:4px 0">₹{{ r.totals.estimatedCost }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">Actual cost</p><h2 style="margin:4px 0">₹{{ r.totals.actualCost }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">Realized margin</p><h2 style="margin:4px 0">₹{{ r.totals.realizedMargin }} <span class="muted" style="font-size:14px">({{ r.totals.marginPct }}%)</span></h2></gw-card>
+    </div>
+    <gw-card padding="none"><gw-table [columns]="cols" [data]="r.lines" emptyText="No lines" /></gw-card>
+  }
+</div>
