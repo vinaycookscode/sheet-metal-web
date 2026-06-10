@@ -1,0 +1,15 @@
+<div class="scan">
+  <gw-icon-button icon="ScanLine" ariaLabel="Scan a code" variant="ghost" (click)="toggle()" />
+
+  @if (open()) {
+    <div class="scan__backdrop" (click)="open.set(false)"></div>
+    <div class="scan__panel">
+      <p class="scan__hint">Scan a label or type a code</p>
+      <input #inp class="scan__input" [value]="value()" (input)="value.set($any($event.target).value)"
+             (keydown.enter)="submit()" (keydown.escape)="open.set(false)"
+             placeholder="e.g. wo:…, lot:…, item:CODE" />
+      @if (error()) { <p class="scan__err">{{ error() }}</p> }
+      <p class="scan__hint scan__hint--sm">Press Enter to go</p>
+    </div>
+  }
+</div>

@@ -9,11 +9,12 @@ import { GwSidebarComponent, GwSidebarSection } from '../shared/ui/navigation/si
 import { GwButtonComponent } from '../shared/ui/buttons/button/button.component';
 import { GwIconButtonComponent } from '../shared/ui/buttons/icon-button/icon-button.component';
 import { NotificationBellComponent } from './notification-bell';
+import { ScanBoxComponent } from './scan-box';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, GwTopNavComponent, GwSidebarComponent, GwButtonComponent, GwIconButtonComponent, NotificationBellComponent],
+  imports: [RouterOutlet, GwTopNavComponent, GwSidebarComponent, GwButtonComponent, GwIconButtonComponent, NotificationBellComponent, ScanBoxComponent],
   templateUrl: './shell.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
