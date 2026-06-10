@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { PlanningService } from '../../core/planning.service';
@@ -10,11 +10,13 @@ import { GwButtonComponent } from '../../shared/ui/buttons/button/button.compone
 import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
 import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/table.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
+import { LabelPrintComponent, LabelItem } from '../../shared/label-print/label-print';
 
 @Component({
   selector: 'app-wo-detail',
   standalone: true,
-  imports: [RouterLink, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwAlertComponent],
+  imports: [RouterLink, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwAlertComponent, GwDrawerComponent, LabelPrintComponent],
   templateUrl: './wo-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,6 +35,12 @@ export class WoDetailPage implements OnInit {
   readonly opRows = signal<Array<Record<string, unknown>>>([]);
   readonly allocations = signal<Array<{ itemId: string; allocated: number; shortfall: number }>>([]);
   readonly issueMsg = signal('');
+  readonly showLabel = signal(false);
+  readonly labels = computed<LabelItem[]>(() => {
+    const w = this.wo();
+    return w ? [{ code: `wo:${w.id}`, title: w.number, lines: [`Qty: ${w.qty}`, `Status: ${w.status}`] }] : [];
+  });
+  printLabel(): void { window.print(); }
 
   readonly opCols: GwTableColumn[] = [
     { key: 'opNo', label: '#', width: '60px' },

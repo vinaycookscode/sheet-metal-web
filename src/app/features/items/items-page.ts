@@ -1,13 +1,16 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CatalogService } from '../../core/catalog.service';
 import { Item } from '../../core/models';
 import { GwCardComponent } from '../../shared/ui/display/card/card.component';
+import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/table.component';
+import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
+import { LabelPrintComponent, LabelItem } from '../../shared/label-print/label-print';
 
 @Component({
   selector: 'app-items-page',
   standalone: true,
-  imports: [GwCardComponent, GwTableComponent],
+  imports: [GwCardComponent, GwButtonComponent, GwTableComponent, GwDrawerComponent, LabelPrintComponent],
   templateUrl: './items-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -16,6 +19,11 @@ export class ItemsPage implements OnInit {
 
   readonly rows = signal<Item[]>([]);
   readonly loading = signal(false);
+  readonly showLabels = signal(false);
+  readonly labels = computed<LabelItem[]>(() =>
+    this.rows().map((i) => ({ code: `item:${i.code}`, title: i.code, lines: [i.name] })),
+  );
+  printLabels(): void { window.print(); }
 
   readonly columns: GwTableColumn[] = [
     { key: 'code', label: 'Code', width: '160px' },

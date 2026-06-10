@@ -4,8 +4,17 @@
       <h1>Items</h1>
       <p class="muted">{{ rows().length }} records</p>
     </div>
+    <gw-button variant="ghost" leadingIcon="Printer" [disabled]="!rows().length" (click)="showLabels.set(true)">Print labels</gw-button>
   </div>
   <gw-card padding="none">
     <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" emptyText="No items yet" />
   </gw-card>
+
+  <gw-drawer [open]="showLabels()" size="xl" title="Item labels" (openChange)="showLabels.set($event)">
+    @if (showLabels()) { <app-label-print [labels]="labels()" /> }
+    <div gw-drawer-footer class="d-flex gap-2" style="justify-content:flex-end">
+      <gw-button variant="ghost" (click)="showLabels.set(false)">Close</gw-button>
+      <gw-button variant="primary" leadingIcon="Printer" (click)="printLabels()">Print / Save PDF</gw-button>
+    </div>
+  </gw-drawer>
 </div>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { InventoryService } from '../../core/inventory.service';
@@ -9,11 +9,13 @@ import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component'
 import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/table.component';
 import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
+import { LabelPrintComponent, LabelItem } from '../../shared/label-print/label-print';
 
 @Component({
   selector: 'app-stock-page',
   standalone: true,
-  imports: [ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwInputComponent, GwAlertComponent],
+  imports: [ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwInputComponent, GwAlertComponent, GwDrawerComponent, LabelPrintComponent],
   templateUrl: './stock-page.html',
   styles: [`
     .lot-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border,#eee)}
@@ -35,6 +37,11 @@ export class StockPage implements OnInit {
   readonly busy = signal(false);
   readonly error = signal('');
   readonly adjustLotId = signal<string | null>(null);
+  readonly showLabels = signal(false);
+  readonly lotLabels = computed<LabelItem[]>(() =>
+    this.lots().map((l) => ({ code: `lot:${l['id']}`, title: String(l['item']), lines: [`Lot: ${l['lotNo']}`, `On hand: ${l['onHand']}`] })),
+  );
+  printLabels(): void { window.print(); }
 
   readonly form = this.fb.nonNullable.group({ qtyDelta: [0], reason: [''] });
 

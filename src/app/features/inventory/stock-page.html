@@ -4,7 +4,10 @@
       <h1>Inventory</h1>
       <p class="muted">Stock on hand, lots &amp; movement ledger</p>
     </div>
-    <gw-button variant="ghost" leadingIcon="RefreshCw" (click)="load()">Refresh</gw-button>
+    <div class="d-flex gap-2">
+      <gw-button variant="ghost" leadingIcon="Printer" [disabled]="!lots().length" (click)="showLabels.set(true)">Print labels</gw-button>
+      <gw-button variant="ghost" leadingIcon="RefreshCw" (click)="load()">Refresh</gw-button>
+    </div>
   </div>
 
   @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
@@ -43,4 +46,12 @@
   <gw-card padding="none">
     <gw-table [columns]="ledgerCols" [data]="ledgerRows()" emptyText="No movements" />
   </gw-card>
+
+  <gw-drawer [open]="showLabels()" size="xl" title="Stock lot labels" (openChange)="showLabels.set($event)">
+    @if (showLabels()) { <app-label-print [labels]="lotLabels()" /> }
+    <div gw-drawer-footer class="d-flex gap-2" style="justify-content:flex-end">
+      <gw-button variant="ghost" (click)="showLabels.set(false)">Close</gw-button>
+      <gw-button variant="primary" leadingIcon="Printer" (click)="printLabels()">Print / Save PDF</gw-button>
+    </div>
+  </gw-drawer>
 </div>

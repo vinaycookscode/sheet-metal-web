@@ -1,0 +1,14 @@
+@if (!rendered().length) {
+  <p class="muted" style="font-size:13px">No labels to print.</p>
+} @else {
+  <div class="labels">
+    @for (l of rendered(); track l.code) {
+      <div class="label">
+        <img [src]="l.qr" alt="QR" />
+        <div class="label__title">{{ l.title }}</div>
+        @for (line of l.lines || []; track line) { <div class="label__line">{{ line }}</div> }
+        <div class="label__code">{{ l.code }}</div>
+      </div>
+    }
+  </div>
+}
