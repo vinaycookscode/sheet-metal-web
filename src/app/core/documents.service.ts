@@ -10,6 +10,8 @@ export interface DocMeta {
   fileName: string;
   mimeType?: string;
   version: number;
+  reviewStatus: string;
+  reviewedAt?: string;
   createdAt: string;
 }
 
@@ -32,6 +34,9 @@ export class DocumentsService {
   }
   download(id: string) {
     return this.http.get(`${this.base}/${id}/download`, { responseType: 'blob' });
+  }
+  review(id: string, status: 'approved' | 'rejected') {
+    return this.http.post<DocMeta>(`${this.base}/${id}/review`, { status });
   }
   remove(id: string) {
     return this.http.delete(`${this.base}/${id}`);

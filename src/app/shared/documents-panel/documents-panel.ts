@@ -78,5 +78,17 @@ export class DocumentsPanelComponent implements OnInit {
     });
   }
 
+  review(d: DocMeta, status: 'approved' | 'rejected'): void {
+    this.busy.set(true);
+    this.error.set('');
+    this.svc.review(d.id, status).subscribe({
+      next: () => { this.busy.set(false); this.load(); },
+      error: (e) => { this.busy.set(false); this.error.set(e?.error?.message ?? 'Review failed'); },
+    });
+  }
+
+  reviewVariant(s: string): string {
+    return { approved: 'success', rejected: 'danger', pending: 'warning' }[s] ?? 'neutral';
+  }
   kindLabel(k: string): string { return k.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()); }
 }

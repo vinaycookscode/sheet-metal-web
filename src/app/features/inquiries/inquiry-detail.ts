@@ -14,11 +14,12 @@ import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-fiel
 import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
 import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+import { DocumentsPanelComponent } from '../../shared/documents-panel/documents-panel';
 
 @Component({
   selector: 'app-inquiry-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwDateInputComponent, GwAlertComponent],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwDateInputComponent, GwAlertComponent, DocumentsPanelComponent],
   templateUrl: './inquiry-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

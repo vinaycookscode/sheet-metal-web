@@ -47,6 +47,11 @@
     <gw-card padding="none">
       <gw-table [columns]="columns" [data]="inq.lines ?? []" emptyText="No lines" />
     </gw-card>
+
+    <p class="muted mb-2 mt-4">Drawings &amp; documents</p>
+    <gw-card padding="lg">
+      <app-documents-panel entityType="inquiry" [entityId]="inq.id" [entityRef]="inq.number" />
+    </gw-card>
   } @else {
     <gw-alert class="mt-3" variant="danger" title="Inquiry not found" />
   }

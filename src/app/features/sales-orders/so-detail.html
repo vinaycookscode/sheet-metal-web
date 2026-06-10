@@ -65,6 +65,9 @@
       </gw-card>
     }
 
+    <p class="muted mb-2 mt-4">Drawings &amp; documents</p>
+    <gw-card padding="lg"><app-documents-panel entityType="sales-order" [entityId]="so.id" [entityRef]="so.number" /></gw-card>
+
     <p class="muted mb-2 mt-4">History</p>
     <gw-card padding="lg"><app-audit-panel entityType="sales-orders" [entityId]="so.id" /></gw-card>
   } @else {

@@ -15,6 +15,7 @@ import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
 import { GwSelectComponent, GwSelectOption } from '../../shared/ui/forms/select/select.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
 import { AuditPanelComponent } from '../../shared/audit-panel/audit-panel';
+import { DocumentsPanelComponent } from '../../shared/documents-panel/documents-panel';
 
 const NEXT: Record<string, string[]> = {
   confirmed: ['in_production', 'cancelled'],
@@ -30,7 +31,7 @@ const humanize = (s: string): string => s.replace(/_/g, ' ').replace(/\b\w/g, (c
 @Component({
   selector: 'app-so-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwAlertComponent, AuditPanelComponent],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwAlertComponent, AuditPanelComponent, DocumentsPanelComponent],
   templateUrl: './so-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

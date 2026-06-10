@@ -23,6 +23,11 @@
         <li class="docs__item">
           <button type="button" class="docs__name" (click)="open(d)">{{ d.fileName }}</button>
           <gw-badge [variant]="$any('neutral')">{{ kindLabel(d.kind) }}</gw-badge>
+          @if (d.kind === 'drawing') {
+            <gw-badge [variant]="$any(reviewVariant(d.reviewStatus))">{{ d.reviewStatus }}</gw-badge>
+            @if (d.reviewStatus !== 'approved') { <gw-button variant="ghost" size="sm" (click)="review(d, 'approved')">Approve</gw-button> }
+            @if (d.reviewStatus !== 'rejected') { <gw-button variant="ghost" size="sm" (click)="review(d, 'rejected')">Reject</gw-button> }
+          }
           <span class="muted">v{{ d.version }}</span>
           <span class="muted">{{ d.createdAt | date:'dd MMM yyyy' }}</span>
           <gw-button variant="ghost" size="sm" (click)="remove(d)">Delete</gw-button>
