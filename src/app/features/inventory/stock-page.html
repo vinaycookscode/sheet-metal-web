@@ -46,6 +46,11 @@
     }
   </gw-card>
 
+  <p class="muted mb-2">Finished goods</p>
+  <gw-card padding="none" class="mb-4">
+    <gw-table [columns]="fgCols" [data]="fgRows()" [loading]="loading()" emptyText="No finished goods in stock" />
+  </gw-card>
+
   <p class="muted mb-2">Recent movements</p>
   <gw-card padding="none">
     <gw-table [columns]="ledgerCols" [data]="ledgerRows()" emptyText="No movements" />

@@ -22,6 +22,9 @@ export class InventoryService {
     const q = itemId ? `?itemId=${itemId}` : '';
     return this.http.get<StockTxnRow[]>(`${this.base}/ledger${q}`);
   }
+  finishedGoods() {
+    return this.http.get<Array<{ id: string; partNo: string; rev: string; salesOrder: string | null; qty: number; qtyShipped: number; available: number; location: string | null; createdAt: string }>>(`${this.base}/finished-goods`);
+  }
   issue(workOrderId: string) {
     return this.http.post<Array<{ stockLotId: string; itemId: string; qty: number }>>(`${this.base}/issue`, { workOrderId });
   }

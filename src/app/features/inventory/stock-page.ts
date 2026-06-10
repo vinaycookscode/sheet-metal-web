@@ -32,7 +32,17 @@ export class StockPage implements OnInit {
   private itemMap = new Map<string, string>();
   readonly summaryRows = signal<Array<Record<string, unknown>>>([]);
   readonly lots = signal<Array<Record<string, unknown>>>([]);
+  readonly fgRows = signal<Array<Record<string, unknown>>>([]);
   readonly ledgerRows = signal<Array<Record<string, unknown>>>([]);
+
+  readonly fgCols: GwTableColumn[] = [
+    { key: 'part', label: 'Part' },
+    { key: 'salesOrder', label: 'Sales order', width: '170px' },
+    { key: 'qty', label: 'Made', width: '90px', align: 'right' },
+    { key: 'shipped', label: 'Shipped', width: '90px', align: 'right' },
+    { key: 'available', label: 'On hand', width: '90px', align: 'right' },
+    { key: 'location', label: 'Location', width: '120px' },
+  ];
   readonly loading = signal(false);
   readonly busy = signal(false);
   readonly error = signal('');
@@ -63,11 +73,12 @@ export class StockPage implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    forkJoin({ summary: this.catalog.stockSummary(), lots: this.inv.list(), ledger: this.inv.ledger(), items: this.catalog.items() }).subscribe({
-      next: ({ summary, lots, ledger, items }) => {
+    forkJoin({ summary: this.catalog.stockSummary(), lots: this.inv.list(), fg: this.inv.finishedGoods(), ledger: this.inv.ledger(), items: this.catalog.items() }).subscribe({
+      next: ({ summary, lots, fg, ledger, items }) => {
         this.itemMap = new Map(items.map((i) => [i.id, `${i.code} — ${i.name}`]));
         this.summaryRows.set(summary.map((s) => ({ code: s.code, name: s.name, onHand: s.onHand, allocated: s.allocated, available: s.available })));
         this.lots.set(lots.map((l) => ({ id: l.id, item: this.itemMap.get(l.itemId) ?? l.itemId, lotNo: l.lotNo ?? '—', location: l.location ?? '—', onHand: l.qtyOnHand, allocated: l.qtyAllocated, isRemnant: l.isRemnant, qcStatus: l.qcStatus ?? 'accepted' })));
+        this.fgRows.set(fg.map((f) => ({ part: `${f.partNo}-${f.rev}`, salesOrder: f.salesOrder ?? '—', qty: f.qty, shipped: f.qtyShipped, available: f.available, location: f.location ?? '—' })));
         this.ledgerRows.set(ledger.slice(0, 50).map((t) => ({ type: t.txn_type, item: this.itemMap.get(t.item_id) ?? t.item_id, delta: t.qty_delta, reference: t.reference ?? '—' })));
         this.loading.set(false);
       },
