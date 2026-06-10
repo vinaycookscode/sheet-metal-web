@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
@@ -51,6 +51,7 @@ export class SoDetailPage implements OnInit {
   readonly planningLineId = signal<string | null>(null);
   readonly partControl = this.fb.control('', { nonNullable: true });
   readonly editing = signal(false);
+  @ViewChild(AuditPanelComponent) private auditPanel?: AuditPanelComponent;
   readonly taxCodes = signal<GwSelectOption[]>([]);
   readonly editForm = this.fb.nonNullable.group({ customerPoNumber: [''], vendorCode: [''], taxCodeId: [''] });
 
@@ -79,7 +80,7 @@ export class SoDetailPage implements OnInit {
     });
   }
 
-  private reload(): void { this.svc.get(this.id).subscribe((o) => this.order.set(o)); }
+  private reload(): void { this.svc.get(this.id).subscribe((o) => this.order.set(o)); this.auditPanel?.reload(); }
 
   startEdit(): void {
     const o = this.order();
@@ -93,7 +94,7 @@ export class SoDetailPage implements OnInit {
     this.busy.set(true);
     this.error.set('');
     this.svc.update(this.id, { customerPoNumber: v.customerPoNumber || undefined, vendorCode: v.vendorCode || undefined, taxCodeId: v.taxCodeId || undefined }).subscribe({
-      next: (o) => { this.order.set(o); this.busy.set(false); this.editing.set(false); },
+      next: (o) => { this.order.set(o); this.busy.set(false); this.editing.set(false); this.auditPanel?.reload(); },
       error: (e) => { this.busy.set(false); this.error.set(e?.error?.message ?? 'Failed to save'); },
     });
   }
@@ -102,7 +103,7 @@ export class SoDetailPage implements OnInit {
     this.busy.set(true);
     this.error.set('');
     this.svc.setStatus(this.id, status).subscribe({
-      next: (o) => { this.order.set(o); this.busy.set(false); },
+      next: (o) => { this.order.set(o); this.busy.set(false); this.auditPanel?.reload(); },
       error: (e) => { this.busy.set(false); this.error.set(e?.error?.message ?? 'Action failed'); },
     });
   }

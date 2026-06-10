@@ -30,6 +30,7 @@ export class DocumentsPanelComponent implements OnInit {
   readonly kind = signal('drawing');
   readonly file = signal<File | null>(null);
   readonly fileName = signal('');
+  readonly maxMb = 25;
 
   ngOnInit(): void { this.load(); }
 
@@ -42,7 +43,16 @@ export class DocumentsPanelComponent implements OnInit {
   }
 
   onFile(e: Event): void {
-    const f = (e.target as HTMLInputElement).files?.[0] ?? null;
+    const input = e.target as HTMLInputElement;
+    const f = input.files?.[0] ?? null;
+    this.error.set('');
+    if (f && f.size > this.maxMb * 1024 * 1024) {
+      this.error.set(`File is too large (${(f.size / 1024 / 1024).toFixed(1)} MB). Max ${this.maxMb} MB.`);
+      this.file.set(null);
+      this.fileName.set('');
+      input.value = '';
+      return;
+    }
     this.file.set(f);
     this.fileName.set(f?.name ?? '');
   }
@@ -55,7 +65,10 @@ export class DocumentsPanelComponent implements OnInit {
     this.error.set('');
     this.svc.upload(this.entityType, this.entityId, this.kind(), f, this.entityRef).subscribe({
       next: () => { this.busy.set(false); this.file.set(null); this.fileName.set(''); this.load(); },
-      error: (e) => { this.busy.set(false); this.error.set(e?.error?.message ?? 'Upload failed'); },
+      error: (e) => {
+        this.busy.set(false);
+        this.error.set(e?.status === 413 ? `File exceeds the ${this.maxMb} MB limit.` : (e?.error?.message ?? 'Upload failed'));
+      },
     });
   }
 

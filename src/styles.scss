@@ -197,6 +197,17 @@ body, .app-topbar, .app-sidebar, .gw-card, .gw-tn-host, .gw-sb {
 // Tighten heading rhythm app-wide
 h1, h2, h3 { letter-spacing: -0.012em; }
 
+// Flash highlight when landing from a notification (?flash=1)
+.app-content.is-flash .page > :first-child,
+.app-content.is-flash .gw-card:first-of-type {
+  animation: sm-flash 1.6s var(--ease);
+}
+@keyframes sm-flash {
+  0% { box-shadow: 0 0 0 3px var(--color-primary); }
+  60% { box-shadow: 0 0 0 3px var(--color-primary-light); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
 // ── Print: isolate the document drawer (.print-doc) onto a clean A4 page ──
 @media print {
   .app-shell { display: block !important; }

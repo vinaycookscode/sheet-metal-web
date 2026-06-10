@@ -17,7 +17,7 @@
     <div gw-sidebar-brand class="sm-sb-brand">Pune Plant · PLANT1</div>
   </gw-sidebar>
 
-  <main class="app-content">
+  <main class="app-content" [class.is-flash]="flash()">
     <router-outlet />
   </main>
 </div>

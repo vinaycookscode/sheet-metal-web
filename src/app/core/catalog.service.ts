@@ -12,6 +12,9 @@ export class CatalogService {
     const q = search ? `?search=${encodeURIComponent(search)}` : '';
     return this.http.get<Supplier[]>(`${this.api}/suppliers${q}`);
   }
+  createSupplier(dto: { code: string; name: string; gstin?: string; stateCode?: string; category?: string; leadTimeDays?: number; paymentTermsDays?: number; rating?: number }) {
+    return this.http.post<Supplier>(`${this.api}/suppliers`, dto);
+  }
 
   items(search?: string) {
     const q = search ? `?search=${encodeURIComponent(search)}` : '';

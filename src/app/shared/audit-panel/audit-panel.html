@@ -1,9 +1,15 @@
 @if (loading()) {
-  <p class="muted" style="font-size:13px">Loading history…</p>
-} @else if (!events().length) {
-  <p class="muted" style="font-size:13px">No history yet.</p>
+  <p class="audit__muted">Loading history…</p>
+} @else if (!lines().length) {
+  <p class="audit__muted">No history yet.</p>
 } @else {
-  @for (e of events(); track e.id) {
-    <gw-audit-row [event]="e" />
-  }
+  <ul class="audit">
+    @for (l of lines(); track l.id) {
+      <li class="audit__row">
+        <span class="audit__dot" [class.audit__dot--crit]="l.critical"></span>
+        <p class="audit__text"><strong>{{ l.actor }}</strong> {{ l.text }}</p>
+        <span class="audit__time">{{ l.time }}</span>
+      </li>
+    }
+  </ul>
 }

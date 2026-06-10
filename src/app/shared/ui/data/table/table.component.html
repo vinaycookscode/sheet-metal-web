@@ -4,17 +4,17 @@
       <tr>
         @for (col of columns; track col.key) {
           <th class="gw-table__th"
-              [class.is-sortable]="col.sortable"
+              [class.is-sortable]="isSortable(col)"
               [class.is-sorted]="sortIndicator(col)"
               [class.gw-table__th--right]="col.align === 'right'"
               [class.gw-table__th--center]="col.align === 'center'"
               [class.gw-table__th--truncate]="col.truncate"
               [ngClass]="col.headerClass || ''"
               [style.width]="col.width || null"
-              [attr.aria-sort]="sortIndicator(col) ? (sortIndicator(col) === 'asc' ? 'ascending' : 'descending') : (col.sortable ? 'none' : null)"
+              [attr.aria-sort]="sortIndicator(col) ? (sortIndicator(col) === 'asc' ? 'ascending' : 'descending') : (isSortable(col) ? 'none' : null)"
               (click)="onHeaderClick(col)">
             <span class="gw-table__th-label">{{ col.label }}</span>
-            @if (col.sortable) {
+            @if (isSortable(col)) {
               <span class="gw-table__sort"
                     [attr.data-dir]="sortIndicator(col)"
                     aria-hidden="true">
@@ -39,8 +39,8 @@
             }
           </tr>
         }
-      } @else if (data && data.length) {
-        @for (row of data; track trackRow($index, row); let i = $index) {
+      } @else if (total()) {
+        @for (row of pageRows(); track trackRow($index, row); let i = $index) {
           <tr class="gw-table__row"
               [attr.tabindex]="rowClick.observed ? 0 : null"
               [attr.role]="rowClick.observed ? 'button' : null"
@@ -69,4 +69,15 @@
       }
     </tbody>
   </table>
+
+  @if (pageSize && total() > pageSize) {
+    <div class="gw-table__pager">
+      <span class="gw-table__pager-info">{{ rangeStart() }}–{{ rangeEnd() }} of {{ total() }}</span>
+      <div class="gw-table__pager-ctrls">
+        <button type="button" class="gw-table__pager-btn" [disabled]="page() === 0" (click)="prev()">Prev</button>
+        <span class="gw-table__pager-page">Page {{ page() + 1 }} / {{ pageCount() }}</span>
+        <button type="button" class="gw-table__pager-btn" [disabled]="page() >= pageCount() - 1" (click)="next()">Next</button>
+      </div>
+    </div>
+  }
 </div>

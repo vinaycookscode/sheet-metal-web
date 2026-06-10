@@ -52,7 +52,9 @@ export interface GwTableSort {
 })
 export class GwTableComponent<T = any> {
   @Input({ required: true }) columns: GwTableColumn[] = [];
-  @Input({ required: true }) data: T[] = [];
+  @Input({ required: true })
+  get data(): T[] { return this._data(); }
+  set data(v: T[]) { this._data.set(v ?? []); this.page.set(0); }
   @Input() loading = false;
   /** Skeleton row count while loading. */
   @Input() skeletonRows = 5;
@@ -63,7 +65,11 @@ export class GwTableComponent<T = any> {
   /** Field on the row to use as a unique id. */
   @Input() trackBy: string | null = null;
   @Input() emptyText = 'No results';
-  /** Current sort state. Sorting is consumer-controlled. */
+  /** Client-side: make every column sortable and sort the data in-place. On by default. */
+  @Input() autoSort = true;
+  /** Client-side pagination page size (0 = off). Defaults to 25. */
+  @Input() pageSize = 25;
+  /** Current sort state. Sorting is consumer-controlled unless `autoSort`. */
   @Input() set sort(value: GwTableSort | null) { this.sortState.set(value); }
   /** Emits when a sortable header is clicked. Parent sorts and feeds back via `data`. */
   @Output() sortChange = new EventEmitter<GwTableSort | null>();
@@ -72,7 +78,38 @@ export class GwTableComponent<T = any> {
 
   @ContentChildren(GwCellDirective) cellTemplates?: QueryList<GwCellDirective>;
 
+  private readonly _data = signal<T[]>([]);
   readonly sortState = signal<GwTableSort | null>(null);
+  readonly page = signal(0);
+
+  /** Sorted (only when autoSort), full set. */
+  readonly sortedRows = computed<T[]>(() => {
+    const rows = this._data();
+    const s = this.sortState();
+    if (!this.autoSort || !s) return rows;
+    const dir = s.direction === 'asc' ? 1 : -1;
+    return [...rows].sort((a, b) => this.compare(this.cellValue(a, s.key), this.cellValue(b, s.key)) * dir);
+  });
+  readonly total = computed(() => this.sortedRows().length);
+  readonly pageCount = computed(() => (this.pageSize ? Math.max(1, Math.ceil(this.total() / this.pageSize)) : 1));
+  readonly pageRows = computed<T[]>(() => {
+    const rows = this.sortedRows();
+    if (!this.pageSize) return rows;
+    const start = this.page() * this.pageSize;
+    return rows.slice(start, start + this.pageSize);
+  });
+  readonly rangeStart = computed(() => (this.total() === 0 ? 0 : this.page() * this.pageSize + 1));
+  readonly rangeEnd = computed(() => Math.min(this.total(), (this.page() + 1) * this.pageSize));
+
+  private compare(a: unknown, b: unknown): number {
+    if (typeof a === 'number' && typeof b === 'number') return a - b;
+    return String(a ?? '').localeCompare(String(b ?? ''), undefined, { numeric: true, sensitivity: 'base' });
+  }
+
+  isSortable(col: GwTableColumn): boolean { return this.autoSort || !!col.sortable; }
+
+  prev(): void { if (this.page() > 0) this.page.update((p) => p - 1); }
+  next(): void { if (this.page() < this.pageCount() - 1) this.page.update((p) => p + 1); }
 
   cellTemplate(key: string): TemplateRef<any> | null {
     if (!this.cellTemplates) return null;
@@ -85,18 +122,19 @@ export class GwTableComponent<T = any> {
   };
 
   onHeaderClick(col: GwTableColumn) {
-    if (!col.sortable) return;
+    if (!this.isSortable(col)) return;
     const current = this.sortState();
     let next: GwTableSort | null;
     if (!current || current.key !== col.key)      next = { key: col.key, direction: 'asc' };
     else if (current.direction === 'asc')         next = { key: col.key, direction: 'desc' };
     else                                          next = null;
     this.sortState.set(next);
+    this.page.set(0);
     this.sortChange.emit(next);
   }
 
   sortIndicator(col: GwTableColumn): 'asc' | 'desc' | null {
-    if (!col.sortable) return null;
+    if (!this.isSortable(col)) return null;
     const s = this.sortState();
     return s && s.key === col.key ? s.direction : null;
   }

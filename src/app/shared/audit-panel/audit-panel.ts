@@ -1,16 +1,28 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, inject, signal } from '@angular/core';
 import { AuditService, AuditEntry } from '../../core/audit.service';
-import { GwAuditRowComponent, GwAuditEvent } from '../ui/enterprise/audit-row/audit-row.component';
 
-const ACTION_LABEL: Record<string, string> = {
-  create: 'created', update: 'updated', delete: 'deleted', status: 'changed status',
+interface AuditLine {
+  id: string | number;
+  actor: string;
+  text: string;
+  time: string;
+  critical: boolean;
+}
+
+const VERB: Record<string, string> = {
+  create: 'created',
+  update: 'updated',
+  delete: 'deleted',
+  status: 'changed the status of',
 };
+const humanize = (s: string): string => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 @Component({
   selector: 'app-audit-panel',
   standalone: true,
-  imports: [GwAuditRowComponent],
+  imports: [],
   templateUrl: './audit-panel.html',
+  styleUrl: './audit-panel.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuditPanelComponent implements OnInit {
@@ -18,26 +30,34 @@ export class AuditPanelComponent implements OnInit {
   @Input({ required: true }) entityType!: string;
   @Input({ required: true }) entityId!: string;
 
-  readonly events = signal<GwAuditEvent[]>([]);
+  readonly lines = signal<AuditLine[]>([]);
   readonly loading = signal(true);
 
-  ngOnInit(): void {
+  ngOnInit(): void { this.reload(); }
+
+  /** Public so parents can refresh the timeline after an action (no page reload). */
+  reload(): void {
     this.svc.list({ entityType: this.entityType, entityId: this.entityId, limit: 100 }).subscribe({
-      next: (rows) => { this.events.set(rows.map((r) => this.toEvent(r))); this.loading.set(false); },
+      next: (rows) => { this.lines.set(rows.map((r) => this.toLine(r))); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
   }
 
-  private toEvent(r: AuditEntry): GwAuditEvent {
-    const status = (r.after && typeof r.after === 'object' ? (r.after as Record<string, unknown>)['status'] : undefined) as string | undefined;
+  private entityLabel(): string {
+    return this.entityType.replace(/-/g, ' ').replace(/s$/, '');
+  }
+
+  private toLine(r: AuditEntry): AuditLine {
+    const verb = VERB[r.action] || r.action;
+    const status = r.after && typeof r.after === 'object' ? (r.after as Record<string, unknown>)['status'] : undefined;
+    const statusClause = typeof status === 'string' && (r.action === 'status' || r.action === 'create') ? ` to ${humanize(status)}` : '';
+    const text = `${verb} this ${this.entityLabel()}${statusClause}.`;
     return {
       id: r.id,
       actor: r.actorName || 'System',
-      action: ACTION_LABEL[r.action] || r.action,
-      resource: this.entityType.replace(/-/g, ' ').replace(/s$/, ''),
-      status,
-      time: new Date(r.at).toLocaleString(),
-      severity: r.action === 'delete' ? 'warning' : 'info',
+      text,
+      time: new Date(r.at).toLocaleString(undefined, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
+      critical: r.action === 'delete',
     };
   }
 }

@@ -2,9 +2,31 @@
   <div class="page-header">
     <div>
       <h1>Suppliers</h1>
-      <p class="muted">{{ rows().length }} records</p>
+      <p class="muted">{{ rows().length }} suppliers</p>
     </div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="showForm.set(!showForm())">New supplier</gw-button>
   </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      <div class="form-grid" [formGroup]="form">
+        <gw-form-field label="Code"><gw-input formControlName="code" placeholder="e.g. SUP-001" /></gw-form-field>
+        <gw-form-field label="Name"><gw-input formControlName="name" /></gw-form-field>
+        <gw-form-field label="Category"><gw-select formControlName="category" [options]="categories" /></gw-form-field>
+        <gw-form-field label="GSTIN"><gw-input formControlName="gstin" placeholder="optional" /></gw-form-field>
+        <gw-form-field label="State code"><gw-input formControlName="stateCode" placeholder="e.g. 27" /></gw-form-field>
+        <gw-form-field label="Lead time (days)"><gw-input type="number" formControlName="leadTimeDays" /></gw-form-field>
+        <gw-form-field label="Payment terms (days)"><gw-input type="number" formControlName="paymentTermsDays" /></gw-form-field>
+        <gw-form-field label="Rating (0–5)"><gw-input type="number" formControlName="rating" /></gw-form-field>
+      </div>
+      @if (error()) { <gw-alert class="mt-3" variant="danger" [title]="error()" /> }
+      <div class="form-actions mt-4">
+        <gw-button variant="ghost" (click)="showForm.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="saving()" [disabled]="form.invalid" (click)="save()">Create supplier</gw-button>
+      </div>
+    </gw-card>
+  }
+
   <gw-card padding="none">
     <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" emptyText="No suppliers yet" />
   </gw-card>

@@ -11,6 +11,7 @@
       @for (k of kinds; track k) { <option [value]="k" [selected]="k === kind()">{{ kindLabel(k) }}</option> }
     </select>
     <gw-button variant="primary" size="sm" leadingIcon="Plus" [loading]="busy()" [disabled]="!file()" (click)="upload()">Upload</gw-button>
+    <span class="muted" style="font-size:12px">Max {{ maxMb }} MB</span>
   </div>
 
   @if (loading()) {

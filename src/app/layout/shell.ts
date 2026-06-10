@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
@@ -89,6 +89,19 @@ export class ShellComponent {
     { initialValue: this.router.url },
   );
   readonly activeKey = computed(() => this.url().split('/')[1] || 'customers');
+
+  /** Brief highlight when arriving from a notification (link carries ?flash=1). */
+  readonly flash = signal(false);
+  private flashTimer?: ReturnType<typeof setTimeout>;
+  constructor() {
+    this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)).subscribe((e) => {
+      if (e.urlAfterRedirects.includes('flash=1')) {
+        this.flash.set(true);
+        if (this.flashTimer) clearTimeout(this.flashTimer);
+        this.flashTimer = setTimeout(() => this.flash.set(false), 1800);
+      }
+    });
+  }
 
   logout(): void {
     this.auth.logout();
