@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 export interface StockLot {
-  id: string; itemId: string; lotNo?: string; location?: string; qtyOnHand: number; qtyAllocated: number; unitCost?: number; isRemnant: boolean;
+  id: string; itemId: string; lotNo?: string; location?: string; qtyOnHand: number; qtyAllocated: number; unitCost?: number; isRemnant: boolean; qcStatus?: string;
 }
 export interface StockTxnRow {
   id: string; txn_type: string; qty_delta: string; stock_lot_id: string; item_id: string; work_order_id: string | null; reference: string | null; at: string;
@@ -30,5 +30,8 @@ export class InventoryService {
   }
   returnRemnant(body: { workOrderId: string; itemId: string; qty: number; location?: string }) {
     return this.http.post<StockLot>(`${this.base}/return-remnant`, body);
+  }
+  lotQc(lotId: string, decision: 'accepted' | 'rejected' | 'hold', note?: string) {
+    return this.http.post<StockLot>(`${this.base}/lots/${lotId}/qc`, { decision, note });
   }
 }

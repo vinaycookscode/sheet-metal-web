@@ -67,7 +67,7 @@ export class StockPage implements OnInit {
       next: ({ summary, lots, ledger, items }) => {
         this.itemMap = new Map(items.map((i) => [i.id, `${i.code} — ${i.name}`]));
         this.summaryRows.set(summary.map((s) => ({ code: s.code, name: s.name, onHand: s.onHand, allocated: s.allocated, available: s.available })));
-        this.lots.set(lots.map((l) => ({ id: l.id, item: this.itemMap.get(l.itemId) ?? l.itemId, lotNo: l.lotNo ?? '—', location: l.location ?? '—', onHand: l.qtyOnHand, allocated: l.qtyAllocated, isRemnant: l.isRemnant })));
+        this.lots.set(lots.map((l) => ({ id: l.id, item: this.itemMap.get(l.itemId) ?? l.itemId, lotNo: l.lotNo ?? '—', location: l.location ?? '—', onHand: l.qtyOnHand, allocated: l.qtyAllocated, isRemnant: l.isRemnant, qcStatus: l.qcStatus ?? 'accepted' })));
         this.ledgerRows.set(ledger.slice(0, 50).map((t) => ({ type: t.txn_type, item: this.itemMap.get(t.item_id) ?? t.item_id, delta: t.qty_delta, reference: t.reference ?? '—' })));
         this.loading.set(false);
       },
@@ -76,6 +76,18 @@ export class StockPage implements OnInit {
   }
 
   startAdjust(lotId: string): void { this.adjustLotId.set(lotId); this.form.reset({ qtyDelta: 0, reason: '' }); this.error.set(''); }
+
+  setQc(lotId: string, decision: 'accepted' | 'rejected' | 'hold'): void {
+    this.busy.set(true);
+    this.error.set('');
+    this.inv.lotQc(lotId, decision).subscribe({
+      next: () => { this.busy.set(false); this.load(); },
+      error: (e) => { this.busy.set(false); this.error.set(e?.error?.message ?? 'QC update failed'); },
+    });
+  }
+  qcVariant(s?: string): string {
+    return { accepted: 'success', rejected: 'danger', hold: 'warning' }[s ?? 'accepted'] ?? 'neutral';
+  }
 
   confirmAdjust(): void {
     const lotId = this.adjustLotId();

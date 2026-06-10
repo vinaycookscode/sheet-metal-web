@@ -25,9 +25,13 @@
         <div class="d-flex items-center gap-2">
           <span>{{ lot['item'] }} · lot {{ lot['lotNo'] }} · {{ lot['location'] }}</span>
           @if (lot['isRemnant']) { <gw-badge variant="warning">remnant</gw-badge> }
+          <gw-badge [variant]="$any(qcVariant($any(lot['qcStatus'])))">QC: {{ lot['qcStatus'] || 'accepted' }}</gw-badge>
         </div>
-        <div class="d-flex items-center gap-3">
+        <div class="d-flex items-center gap-2">
           <span class="muted">on hand {{ lot['onHand'] }} · alloc {{ lot['allocated'] }}</span>
+          @if (lot['qcStatus'] !== 'accepted') { <gw-button size="sm" variant="ghost" [loading]="busy()" (click)="setQc($any(lot['id']), 'accepted')">Accept</gw-button> }
+          @if (lot['qcStatus'] !== 'hold') { <gw-button size="sm" variant="ghost" [loading]="busy()" (click)="setQc($any(lot['id']), 'hold')">Hold</gw-button> }
+          @if (lot['qcStatus'] !== 'rejected') { <gw-button size="sm" variant="ghost" [loading]="busy()" (click)="setQc($any(lot['id']), 'rejected')">Reject</gw-button> }
           <gw-button size="sm" variant="ghost" (click)="startAdjust($any(lot['id']))">Adjust</gw-button>
         </div>
       </div>
