@@ -64,6 +64,9 @@
         }
       </gw-card>
     }
+
+    <p class="muted mb-2 mt-4">History</p>
+    <gw-card padding="lg"><app-audit-panel entityType="sales-orders" [entityId]="so.id" /></gw-card>
   } @else {
     <gw-alert class="mt-3" variant="danger" title="Sales order not found" />
   }

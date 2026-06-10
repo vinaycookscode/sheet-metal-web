@@ -1,0 +1,9 @@
+@if (loading()) {
+  <p class="muted" style="font-size:13px">Loading history…</p>
+} @else if (!events().length) {
+  <p class="muted" style="font-size:13px">No history yet.</p>
+} @else {
+  @for (e of events(); track e.id) {
+    <gw-audit-row [event]="e" />
+  }
+}
