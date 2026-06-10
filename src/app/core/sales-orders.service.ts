@@ -15,8 +15,11 @@ export class SalesOrdersService {
   get(id: string) {
     return this.http.get<SalesOrder>(`${this.base}/${id}`);
   }
-  fromQuote(quoteVersionId: string, customerPoNumber?: string) {
-    return this.http.post<SalesOrder>(`${this.base}/from-quote/${quoteVersionId}`, { customerPoNumber });
+  fromQuote(quoteVersionId: string, body: { customerPoNumber?: string; vendorCode?: string } = {}) {
+    return this.http.post<SalesOrder>(`${this.base}/from-quote/${quoteVersionId}`, body);
+  }
+  update(id: string, body: { customerPoNumber?: string; vendorCode?: string; taxCodeId?: string; orderDate?: string }) {
+    return this.http.patch<SalesOrder>(`${this.base}/${id}`, body);
   }
   setStatus(id: string, status: string) {
     return this.http.post<SalesOrder>(`${this.base}/${id}/status`, { status });

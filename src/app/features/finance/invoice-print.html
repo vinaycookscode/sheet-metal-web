@@ -1,0 +1,112 @@
+@if (loading()) {
+  <p class="status">Loading…</p>
+} @else if (error()) {
+  <p class="status error">{{ error() }}</p>
+} @else if (doc(); as d) {
+  <div class="sheet">
+    <!-- Header -->
+    <div class="head">
+      <div class="seller">
+        <div class="seller-name">{{ d.seller.name }}</div>
+        @for (l of addrLines(d.seller.address); track l) { <div>{{ l }}</div> }
+        <div class="muted">GSTIN: <strong>{{ d.seller.gstin || '—' }}</strong> · State Code: {{ d.seller.stateCode || '—' }}</div>
+      </div>
+      <div class="title-box">
+        <div class="doc-title">{{ d.title }}</div>
+        <table class="meta">
+          <tr><td>Invoice No.</td><td><strong>{{ d.invoice.number }}</strong></td></tr>
+          <tr><td>Invoice Date</td><td>{{ d.invoice.date | date:'dd MMM yyyy' }}</td></tr>
+          <tr><td>Status</td><td>{{ label(d.invoice.status) }}</td></tr>
+          @if (d.invoice.salesOrder) { <tr><td>Sales Order</td><td>{{ d.invoice.salesOrder }}</td></tr> }
+          @if (d.invoice.customerPo) { <tr><td>Customer PO</td><td>{{ d.invoice.customerPo }}</td></tr> }
+          @if (d.invoice.shipment) { <tr><td>Challan</td><td>{{ d.invoice.shipment }}</td></tr> }
+        </table>
+      </div>
+    </div>
+
+    <!-- Parties -->
+    <div class="parties">
+      <div class="party">
+        <div class="party-label">Bill To</div>
+        <div class="party-name">{{ d.buyer.name }}</div>
+        @for (l of addrLines(d.buyer.billingAddress); track l) { <div>{{ l }}</div> }
+        <div class="muted">GSTIN: {{ d.buyer.gstin || '—' }} · State Code: {{ d.buyer.stateCode || '—' }}</div>
+      </div>
+      <div class="party">
+        <div class="party-label">Ship To</div>
+        <div class="party-name">{{ d.buyer.name }}</div>
+        @for (l of addrLines(d.buyer.shippingAddress || d.buyer.billingAddress); track l) { <div>{{ l }}</div> }
+        <div class="muted">Place of Supply: {{ d.invoice.placeOfSupply || '—' }}</div>
+      </div>
+    </div>
+
+    <!-- Lines -->
+    <table class="lines">
+      <thead>
+        <tr>
+          <th class="r" style="width:32px">#</th>
+          <th>Description</th>
+          <th style="width:70px">HSN/SAC</th>
+          <th class="r" style="width:56px">Qty</th>
+          <th class="r" style="width:80px">Rate</th>
+          <th class="r" style="width:90px">Taxable</th>
+          @if (intra()) {
+            <th class="r" style="width:78px">CGST</th>
+            <th class="r" style="width:78px">SGST</th>
+          } @else {
+            <th class="r" style="width:90px">IGST</th>
+          }
+          <th class="r" style="width:96px">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ln of d.lines; track ln.lineNo) {
+          <tr>
+            <td class="r">{{ ln.lineNo }}</td>
+            <td>{{ ln.description }}</td>
+            <td>{{ ln.hsnSac || '—' }}</td>
+            <td class="r">{{ ln.qty }}</td>
+            <td class="r">{{ ln.unitPrice | number:'1.2-2' }}</td>
+            <td class="r">{{ ln.taxableValue | number:'1.2-2' }}</td>
+            @if (intra()) {
+              <td class="r">{{ ln.cgst | number:'1.2-2' }}<br><span class="rate">{{ ln.gstRate / 2 }}%</span></td>
+              <td class="r">{{ ln.sgst | number:'1.2-2' }}<br><span class="rate">{{ ln.gstRate / 2 }}%</span></td>
+            } @else {
+              <td class="r">{{ ln.igst | number:'1.2-2' }}<br><span class="rate">{{ ln.gstRate }}%</span></td>
+            }
+            <td class="r">{{ ln.amount | number:'1.2-2' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="foot">
+      <div class="words">
+        <div class="party-label">Amount in words</div>
+        <div class="words-text">{{ d.amountInWords }}</div>
+        <div class="muted" style="margin-top:10px">GST treatment: {{ label(d.invoice.gstTreatment) }} · Reverse charge: No</div>
+      </div>
+      <table class="totals">
+        <tr><td>Taxable Value</td><td class="r">{{ d.totals.subtotal | number:'1.2-2' }}</td></tr>
+        @if (intra()) {
+          <tr><td>CGST</td><td class="r">{{ d.totals.cgst | number:'1.2-2' }}</td></tr>
+          <tr><td>SGST</td><td class="r">{{ d.totals.sgst | number:'1.2-2' }}</td></tr>
+        } @else {
+          <tr><td>IGST</td><td class="r">{{ d.totals.igst | number:'1.2-2' }}</td></tr>
+        }
+        <tr class="grand"><td>Grand Total</td><td class="r">₹ {{ d.totals.grandTotal | number:'1.2-2' }}</td></tr>
+        <tr><td>Amount Paid</td><td class="r">{{ d.totals.amountPaid | number:'1.2-2' }}</td></tr>
+        <tr><td>Balance Due</td><td class="r">{{ d.totals.balance | number:'1.2-2' }}</td></tr>
+      </table>
+    </div>
+
+    <div class="sign">
+      <div class="declaration muted">Certified that the particulars given above are true and correct.</div>
+      <div class="sign-box">
+        <div>For <strong>{{ d.seller.name }}</strong></div>
+        <div class="sign-line">Authorised Signatory</div>
+      </div>
+    </div>
+  </div>
+}

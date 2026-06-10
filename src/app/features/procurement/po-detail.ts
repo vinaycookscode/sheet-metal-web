@@ -11,13 +11,15 @@ import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component'
 import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/table.component';
 import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
+import { PoPrintPage } from './po-print';
 
 interface LineMeta { id: string; item: string; qty: number; received: number; }
 
 @Component({
   selector: 'app-po-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwInputComponent, GwAlertComponent],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwInputComponent, GwAlertComponent, GwDrawerComponent, PoPrintPage],
   templateUrl: './po-detail.html',
   styles: [`.recv-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border,#eee)}`],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +40,8 @@ export class PoDetailPage implements OnInit {
   readonly grnRows = signal<Array<Record<string, unknown>>>([]);
   readonly lineMeta = signal<LineMeta[]>([]);
   readonly showReceive = signal(false);
+  readonly showDoc = signal(false);
+  printDoc(): void { window.print(); }
 
   readonly recv = this.fb.array<FormGroup>([]);
 

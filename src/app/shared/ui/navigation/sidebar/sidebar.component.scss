@@ -64,7 +64,7 @@
   transition: background-color var(--t-fast) ease, color var(--t-fast) ease;
 
   &:hover { background: var(--bg-hover); color: var(--text-primary); }
-  &.is-active { background: var(--color-primary-subtle); color: var(--color-primary); }
+  &.is-active { background: var(--color-primary-subtle); color: var(--color-primary); font-weight: 600; }
   &.is-disabled { color: var(--text-disabled); pointer-events: none; }
 }
 
@@ -96,7 +96,7 @@
   font-weight: 600;
 }
 
-.gw-sb__item.is-active .gw-sb__badge { background: rgba(37,99,235,0.16); color: var(--color-primary); }
+.gw-sb__item.is-active .gw-sb__badge { background: var(--color-primary-light); color: var(--color-primary); }
 
 .gw-sb__footer { padding: 0 4px; }
 

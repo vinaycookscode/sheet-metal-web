@@ -1,0 +1,102 @@
+@if (loading()) {
+  <p class="status">Loading…</p>
+} @else if (error()) {
+  <p class="status error">{{ error() }}</p>
+} @else if (doc(); as d) {
+  <div class="sheet">
+    <div class="head">
+      <div class="seller">
+        <div class="seller-name">{{ d.buyer.name }}</div>
+        @for (l of addrLines(d.buyer.address); track l) { <div>{{ l }}</div> }
+        <div class="muted">GSTIN: <strong>{{ d.buyer.gstin || '—' }}</strong> · State Code: {{ d.buyer.stateCode || '—' }}</div>
+      </div>
+      <div class="title-box">
+        <div class="doc-title">{{ d.title }}</div>
+        <table class="meta">
+          <tr><td>PO No.</td><td><strong>{{ d.po.number }}</strong></td></tr>
+          <tr><td>Date</td><td>{{ d.po.date | date:'dd MMM yyyy' }}</td></tr>
+          <tr><td>Status</td><td>{{ label(d.po.status) }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="parties">
+      <div class="party">
+        <div class="party-label">Supplier (Vendor)</div>
+        <div class="party-name">{{ d.supplier.name }}</div>
+        <div class="muted">Code: {{ d.supplier.code || '—' }}</div>
+        <div class="muted">GSTIN: {{ d.supplier.gstin || '—' }} · State Code: {{ d.supplier.stateCode || '—' }}</div>
+      </div>
+      <div class="party">
+        <div class="party-label">Deliver To</div>
+        <div class="party-name">{{ d.buyer.plant }}</div>
+        @for (l of addrLines(d.buyer.address); track l) { <div>{{ l }}</div> }
+      </div>
+    </div>
+
+    <table class="lines">
+      <thead>
+        <tr>
+          <th class="r" style="width:32px">#</th>
+          <th>Item / Material</th>
+          <th style="width:70px">HSN/SAC</th>
+          <th class="r" style="width:56px">Qty</th>
+          <th class="r" style="width:80px">Rate</th>
+          <th class="r" style="width:90px">Taxable</th>
+          @if (intra()) {
+            <th class="r" style="width:78px">CGST</th>
+            <th class="r" style="width:78px">SGST</th>
+          } @else {
+            <th class="r" style="width:90px">IGST</th>
+          }
+          <th class="r" style="width:96px">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ln of d.lines; track ln.lineNo) {
+          <tr>
+            <td class="r">{{ ln.lineNo }}</td>
+            <td>{{ ln.description }}</td>
+            <td>{{ ln.hsnSac || '—' }}</td>
+            <td class="r">{{ ln.qty }}</td>
+            <td class="r">{{ ln.unitPrice | number:'1.2-2' }}</td>
+            <td class="r">{{ ln.taxableValue | number:'1.2-2' }}</td>
+            @if (intra()) {
+              <td class="r">{{ ln.cgst | number:'1.2-2' }}<br><span class="rate">{{ ln.gstRate / 2 }}%</span></td>
+              <td class="r">{{ ln.sgst | number:'1.2-2' }}<br><span class="rate">{{ ln.gstRate / 2 }}%</span></td>
+            } @else {
+              <td class="r">{{ ln.igst | number:'1.2-2' }}<br><span class="rate">{{ ln.gstRate }}%</span></td>
+            }
+            <td class="r">{{ ln.amount | number:'1.2-2' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="foot">
+      <div class="words">
+        <div class="party-label">Amount in words</div>
+        <div class="words-text">{{ d.amountInWords }}</div>
+        <div class="muted" style="margin-top:10px">GST treatment: {{ label(d.po.gstTreatment) }}</div>
+      </div>
+      <table class="totals">
+        <tr><td>Taxable Value</td><td class="r">{{ d.totals.subtotal | number:'1.2-2' }}</td></tr>
+        @if (intra()) {
+          <tr><td>CGST</td><td class="r">{{ d.totals.cgst | number:'1.2-2' }}</td></tr>
+          <tr><td>SGST</td><td class="r">{{ d.totals.sgst | number:'1.2-2' }}</td></tr>
+        } @else {
+          <tr><td>IGST</td><td class="r">{{ d.totals.igst | number:'1.2-2' }}</td></tr>
+        }
+        <tr class="grand"><td>Grand Total</td><td class="r">₹ {{ d.totals.grandTotal | number:'1.2-2' }}</td></tr>
+      </table>
+    </div>
+
+    <div class="sign">
+      <div class="declaration muted">Please supply the above materials per agreed terms &amp; delivery schedule.</div>
+      <div class="sign-box">
+        <div>For <strong>{{ d.buyer.name }}</strong></div>
+        <div class="sign-line">Authorised Signatory</div>
+      </div>
+    </div>
+  </div>
+}

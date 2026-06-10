@@ -10,6 +10,9 @@
         <gw-badge [variant]="$any(statusVariant(inq.status))">{{ inq.status }}</gw-badge>
       </div>
       <div class="d-flex gap-2">
+        @if (canChange(inq.status) && !editing()) {
+          <gw-button variant="ghost" leadingIcon="Pencil" [disabled]="busy()" (click)="startEdit()">Edit</gw-button>
+        }
         @if (inq.status === 'new') {
           <gw-button variant="secondary" leadingIcon="ArrowRight" [loading]="busy()" (click)="send()">Send to estimation</gw-button>
         }
@@ -24,10 +27,21 @@
     @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
 
     <gw-card padding="lg" class="mb-4">
-      <div class="form-grid">
-        <div><p class="muted">Required date</p><p>{{ inq.requiredDate ?? '—' }}</p></div>
-        <div><p class="muted">Notes</p><p>{{ inq.notes ?? '—' }}</p></div>
-      </div>
+      @if (editing()) {
+        <div class="form-grid" [formGroup]="editForm">
+          <gw-form-field label="Required date"><gw-date-input formControlName="requiredDate" /></gw-form-field>
+          <gw-form-field label="Notes"><gw-input formControlName="notes" placeholder="Optional notes" /></gw-form-field>
+        </div>
+        <div class="form-actions mt-3">
+          <gw-button variant="ghost" (click)="editing.set(false)">Cancel</gw-button>
+          <gw-button variant="primary" [loading]="busy()" (click)="saveEdit()">Save changes</gw-button>
+        </div>
+      } @else {
+        <div class="form-grid">
+          <div><p class="muted">Required date</p><p>{{ inq.requiredDate ?? '—' }}</p></div>
+          <div><p class="muted">Notes</p><p>{{ inq.notes ?? '—' }}</p></div>
+        </div>
+      }
     </gw-card>
 
     <gw-card padding="none">

@@ -1,0 +1,44 @@
+:host { display: block; }
+
+.status { text-align: center; padding: 48px; color: var(--text-secondary); }
+.status.error { color: var(--color-danger); }
+
+// The document — always a white "paper" look (even in dark mode)
+.sheet {
+  max-width: 100%; margin: 0; background: #ffffff; color: #1a1a1a;
+  padding: 28px 32px; border: 1px solid #e3e3e3;
+  font-size: 12px; line-height: 1.45;
+}
+.muted { color: #6b6b6b; }
+.r { text-align: right; }
+
+.head { display: flex; justify-content: space-between; gap: 24px; border-bottom: 2px solid #1a1a1a; padding-bottom: 14px; }
+.seller-name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.title-box { text-align: right; min-width: 250px; }
+.doc-title { font-size: 19px; font-weight: 800; letter-spacing: 2px; }
+.meta { margin-top: 8px; margin-left: auto; font-size: 11px; border-collapse: collapse; }
+.meta td { padding: 1px 4px; }
+.meta td:first-child { color: #6b6b6b; text-align: right; }
+
+.parties { display: grid; grid-template-columns: 1fr 1fr; margin-top: 16px; border: 1px solid #d4d4d4; }
+.party { padding: 10px 14px; }
+.party + .party { border-left: 1px solid #d4d4d4; }
+.party-label { font-size: 10px; text-transform: uppercase; color: #6b6b6b; letter-spacing: .6px; }
+.party-name { font-weight: 600; margin: 3px 0; }
+
+table.lines { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 11px; }
+.lines th { background: #f4f4f4; border: 1px solid #d0d0d0; padding: 7px 6px; text-align: left; font-weight: 600; }
+.lines td { border: 1px solid #e0e0e0; padding: 6px; vertical-align: top; }
+.rate { color: #9a9a9a; font-size: 9px; }
+
+.foot { display: flex; justify-content: space-between; gap: 24px; margin-top: 16px; }
+.words { flex: 1; }
+.words-text { font-weight: 600; font-style: italic; }
+table.totals { width: 290px; border-collapse: collapse; font-size: 12px; }
+.totals td { padding: 4px 10px; }
+.totals tr.grand td { border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; font-weight: 700; font-size: 13px; }
+
+.sign { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 32px; }
+.declaration { max-width: 360px; }
+.sign-box { text-align: right; }
+.sign-line { margin-top: 46px; border-top: 1px solid #8a8a8a; padding-top: 4px; font-size: 11px; }

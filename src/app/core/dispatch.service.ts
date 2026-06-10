@@ -2,6 +2,17 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { EwayBill, Shipment } from './models';
+import { Address } from './finance.service';
+
+export interface ChallanDocument {
+  title: string;
+  seller: { name: string; plant: string; gstin?: string; stateCode?: string; address?: Address };
+  buyer: { name: string; code?: string; gstin?: string; stateCode?: string; billingAddress?: Address; shippingAddress?: Address };
+  challan: { number: string; date: string; status: string; salesOrder?: string | null; customerPo?: string | null };
+  transport: { carrier?: string | null; trackingNo?: string | null; ewbNumber?: string | null; vehicleNo?: string | null };
+  lines: Array<{ lineNo: number; description: string; qty: number; boxNo: string; weightKg: number | null }>;
+  totals: { totalQty: number; totalWeightKg: number | null };
+}
 
 @Injectable({ providedIn: 'root' })
 export class DispatchService {
@@ -21,6 +32,7 @@ export class DispatchService {
     return this.http.post<Shipment>(`${this.base}/${id}/dispatch`, body);
   }
   challan(id: string) { return this.http.get<any>(`${this.base}/${id}/challan`); }
+  document(id: string) { return this.http.get<ChallanDocument>(`${this.base}/${id}/document`); }
   getEway(id: string) { return this.http.get<EwayBill>(`${this.base}/${id}/eway-bill`); }
   genEway(id: string, body: { value: number; distanceKm: number; vehicleNo: string }) {
     return this.http.post<EwayBill>(`${this.base}/${id}/eway-bill`, body);

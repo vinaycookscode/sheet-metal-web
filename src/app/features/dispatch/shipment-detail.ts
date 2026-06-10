@@ -10,11 +10,13 @@ import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/tabl
 import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
 import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
+import { ChallanPrintPage } from './challan-print';
 
 @Component({
   selector: 'app-shipment-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwAlertComponent],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwAlertComponent, GwDrawerComponent, ChallanPrintPage],
   templateUrl: './shipment-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,6 +33,8 @@ export class ShipmentDetailPage implements OnInit {
   readonly eway = signal<EwayBill | null>(null);
   readonly challan = signal<any>(null);
   readonly showEway = signal(false);
+  readonly showDoc = signal(false);
+  printDoc(): void { window.print(); }
 
   readonly dispatchForm = this.fb.nonNullable.group({ carrier: [''], trackingNo: [''] });
   readonly ewayForm = this.fb.nonNullable.group({ value: [60000, Validators.min(1)], distanceKm: [100, Validators.min(1)], vehicleNo: ['', Validators.required] });

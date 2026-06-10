@@ -33,7 +33,7 @@ export class SoListPage implements OnInit {
     forkJoin({ orders: this.svc.list(), customers: this.customersSvc.list() }).subscribe({
       next: ({ orders, customers }) => {
         const byId = new Map(customers.map((c) => [c.id, `${c.code} — ${c.name}`]));
-        this.rows.set(orders.map((o) => ({ id: o.id, number: o.number, customer: byId.get(o.customerId) ?? o.customerId, status: o.status, orderDate: o.orderDate })));
+        this.rows.set(orders.map((o) => ({ id: o.id, number: o.number, customer: byId.get(o.customerId) ?? o.customerId, status: o.status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()), orderDate: o.orderDate })));
         this.loading.set(false);
       },
       error: () => this.loading.set(false),

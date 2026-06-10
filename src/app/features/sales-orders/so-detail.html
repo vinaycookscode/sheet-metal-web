@@ -10,6 +10,9 @@
         <gw-badge [variant]="$any(statusVariant(so.status))">{{ label(so.status) }}</gw-badge>
       </div>
       <div class="d-flex gap-2">
+        @if (!editing()) {
+          <gw-button variant="ghost" leadingIcon="Pencil" [disabled]="busy()" (click)="startEdit()">Edit</gw-button>
+        }
         @for (s of nextStatuses(); track s) {
           <gw-button [variant]="s === 'cancelled' ? 'ghost' : 'secondary'" [loading]="busy()" (click)="advance(s)">{{ label(s) }}</gw-button>
         }
@@ -19,14 +22,27 @@
     @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
 
     <gw-card padding="lg" class="mb-4">
-      <div class="form-grid">
-        <div><p class="muted">Customer PO</p><p>{{ so.customerPoNumber ?? '—' }}</p></div>
-        <div><p class="muted">Order date</p><p>{{ so.orderDate }}</p></div>
-      </div>
+      @if (editing()) {
+        <div class="form-grid" [formGroup]="editForm">
+          <gw-form-field label="Customer PO number"><gw-input formControlName="customerPoNumber" placeholder="e.g. PO-9931" /></gw-form-field>
+          <gw-form-field label="Vendor code"><gw-input formControlName="vendorCode" placeholder="our code at the customer" /></gw-form-field>
+          <gw-form-field label="HSN / GST (applies to all lines)" class="field--full"><gw-select [formControl]="$any(editForm.controls.taxCodeId)" [options]="taxCodes()" placeholder="Select HSN / GST rate" /></gw-form-field>
+        </div>
+        <div class="form-actions mt-3">
+          <gw-button variant="ghost" (click)="editing.set(false)">Cancel</gw-button>
+          <gw-button variant="primary" [loading]="busy()" (click)="saveEdit()">Save changes</gw-button>
+        </div>
+      } @else {
+        <div class="form-grid">
+          <div><p class="muted">Customer PO</p><p>{{ so.customerPoNumber ?? '—' }}</p></div>
+          <div><p class="muted">Vendor code</p><p>{{ so.vendorCode ?? '—' }}</p></div>
+          <div><p class="muted">Order date</p><p>{{ so.orderDate }}</p></div>
+        </div>
+      }
     </gw-card>
 
     <gw-card padding="none" class="mb-4">
-      <gw-table [columns]="columns" [data]="so.lines ?? []" emptyText="No lines" />
+      <gw-table [columns]="columns" [data]="lineRows()" emptyText="No lines" />
     </gw-card>
 
     @if (openLines().length) {

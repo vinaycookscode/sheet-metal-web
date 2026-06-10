@@ -12,7 +12,7 @@
       <div class="d-flex gap-2">
         @if (s.status === 'draft') { <gw-button variant="secondary" [loading]="busy()" (click)="pack()">Pack</gw-button> }
         @if (s.status === 'dispatched') {
-          <gw-button variant="ghost" leadingIcon="Printer" (click)="viewChallan()">Challan</gw-button>
+          <gw-button variant="ghost" leadingIcon="Printer" (click)="showDoc.set(true)">Print Challan</gw-button>
           @if (!eway()) { <gw-button variant="primary" leadingIcon="FileText" (click)="showEway.set(!showEway())">E-way bill</gw-button> }
         }
       </div>
@@ -59,6 +59,14 @@
 
     <p class="muted mb-2">Packed lines</p>
     <gw-card padding="none"><gw-table [columns]="lineCols" [data]="s.lines ?? []" /></gw-card>
+
+    <gw-drawer [open]="showDoc()" size="xl" title="Delivery Challan" (openChange)="showDoc.set($event)">
+      @if (showDoc()) { <app-challan-print [id]="s.id" /> }
+      <div gw-drawer-footer class="d-flex gap-2" style="justify-content:flex-end">
+        <gw-button variant="ghost" (click)="showDoc.set(false)">Close</gw-button>
+        <gw-button variant="primary" leadingIcon="Printer" (click)="printDoc()">Print / Save PDF</gw-button>
+      </div>
+    </gw-drawer>
   } @else {
     <gw-alert class="mt-3" variant="danger" title="Shipment not found" />
   }

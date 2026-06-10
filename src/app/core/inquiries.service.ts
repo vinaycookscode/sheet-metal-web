@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { CreateInquiry, Inquiry } from './models';
+import { CreateInquiry, CreateInquiryLine, Inquiry } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class InquiriesService {
@@ -17,6 +17,12 @@ export class InquiriesService {
   }
   create(dto: CreateInquiry) {
     return this.http.post<Inquiry>(this.base, dto);
+  }
+  update(id: string, body: { customerId?: string; requiredDate?: string; notes?: string; estimatorId?: string }) {
+    return this.http.patch<Inquiry>(`${this.base}/${id}`, body);
+  }
+  replaceLines(id: string, lines: CreateInquiryLine[]) {
+    return this.http.put<Inquiry>(`${this.base}/${id}/lines`, { lines });
   }
   sendToEstimation(id: string, estimatorId: string) {
     return this.http.post<Inquiry>(`${this.base}/${id}/send-to-estimation`, { estimatorId });

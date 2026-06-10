@@ -1,0 +1,89 @@
+@if (loading()) {
+  <p class="status">Loading…</p>
+} @else if (error()) {
+  <p class="status error">{{ error() }}</p>
+} @else if (doc(); as d) {
+  <div class="sheet">
+    <div class="head">
+      <div class="seller">
+        <div class="seller-name">{{ d.seller.name }}</div>
+        @for (l of addrLines(d.seller.address); track l) { <div>{{ l }}</div> }
+        <div class="muted">GSTIN: <strong>{{ d.seller.gstin || '—' }}</strong> · State Code: {{ d.seller.stateCode || '—' }}</div>
+      </div>
+      <div class="title-box">
+        <div class="doc-title">{{ d.title }}</div>
+        <table class="meta">
+          <tr><td>Challan No.</td><td><strong>{{ d.challan.number }}</strong></td></tr>
+          <tr><td>Date</td><td>{{ d.challan.date | date:'dd MMM yyyy' }}</td></tr>
+          <tr><td>Status</td><td>{{ label(d.challan.status) }}</td></tr>
+          @if (d.challan.salesOrder) { <tr><td>Sales Order</td><td>{{ d.challan.salesOrder }}</td></tr> }
+          @if (d.challan.customerPo) { <tr><td>Customer PO</td><td>{{ d.challan.customerPo }}</td></tr> }
+        </table>
+      </div>
+    </div>
+
+    <div class="parties">
+      <div class="party">
+        <div class="party-label">Bill To</div>
+        <div class="party-name">{{ d.buyer.name }}</div>
+        @for (l of addrLines(d.buyer.billingAddress); track l) { <div>{{ l }}</div> }
+        <div class="muted">GSTIN: {{ d.buyer.gstin || '—' }} · State Code: {{ d.buyer.stateCode || '—' }}</div>
+      </div>
+      <div class="party">
+        <div class="party-label">Ship To</div>
+        <div class="party-name">{{ d.buyer.name }}</div>
+        @for (l of addrLines(d.buyer.shippingAddress || d.buyer.billingAddress); track l) { <div>{{ l }}</div> }
+      </div>
+    </div>
+
+    <table class="meta" style="margin-top:14px; width:100%">
+      <tr>
+        <td>Transporter / Carrier: <strong>{{ d.transport.carrier || '—' }}</strong></td>
+        <td>Vehicle No.: <strong>{{ d.transport.vehicleNo || '—' }}</strong></td>
+        <td>E-way Bill: <strong>{{ d.transport.ewbNumber || '—' }}</strong></td>
+        <td>Tracking: <strong>{{ d.transport.trackingNo || '—' }}</strong></td>
+      </tr>
+    </table>
+
+    <table class="lines">
+      <thead>
+        <tr>
+          <th class="r" style="width:32px">#</th>
+          <th>Description of Goods</th>
+          <th class="r" style="width:90px">Quantity</th>
+          <th style="width:90px">Box / Pkg</th>
+          <th class="r" style="width:110px">Weight (kg)</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ln of d.lines; track ln.lineNo) {
+          <tr>
+            <td class="r">{{ ln.lineNo }}</td>
+            <td>{{ ln.description }}</td>
+            <td class="r">{{ ln.qty }}</td>
+            <td>{{ ln.boxNo || '—' }}</td>
+            <td class="r">{{ ln.weightKg != null ? (ln.weightKg | number:'1.0-3') : '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="foot">
+      <div class="words">
+        <div class="muted">Goods once dispatched are as per the above sales order. Not a tax invoice.</div>
+      </div>
+      <table class="totals">
+        <tr class="grand"><td>Total Qty</td><td class="r">{{ d.totals.totalQty }}</td></tr>
+        <tr><td>Total Weight (kg)</td><td class="r">{{ d.totals.totalWeightKg != null ? (d.totals.totalWeightKg | number:'1.0-3') : '—' }}</td></tr>
+      </table>
+    </div>
+
+    <div class="sign">
+      <div class="declaration muted">Received the above goods in good condition.</div>
+      <div class="sign-box">
+        <div>For <strong>{{ d.seller.name }}</strong></div>
+        <div class="sign-line">Authorised Signatory</div>
+      </div>
+    </div>
+  </div>
+}

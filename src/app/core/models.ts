@@ -92,7 +92,7 @@ export interface SoLine {
 }
 export interface SalesOrder {
   id: string; number: string; customerId: string; status: string;
-  customerPoNumber?: string; orderDate: string; lines?: SoLine[]; createdAt: string;
+  customerPoNumber?: string; vendorCode?: string; orderDate: string; lines?: SoLine[]; createdAt: string;
 }
 
 // ── Engineering ──

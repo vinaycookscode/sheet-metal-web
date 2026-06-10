@@ -3,22 +3,27 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { AuthService } from '../core/auth.service';
+import { ThemeService } from '../core/theme.service';
 import { GwTopNavComponent } from '../shared/ui/navigation/top-nav/top-nav.component';
 import { GwSidebarComponent, GwSidebarSection } from '../shared/ui/navigation/sidebar/sidebar.component';
 import { GwButtonComponent } from '../shared/ui/buttons/button/button.component';
+import { GwIconButtonComponent } from '../shared/ui/buttons/icon-button/icon-button.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, GwTopNavComponent, GwSidebarComponent, GwButtonComponent],
+  imports: [RouterOutlet, GwTopNavComponent, GwSidebarComponent, GwButtonComponent, GwIconButtonComponent],
   templateUrl: './shell.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShellComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly themeSvc = inject(ThemeService);
 
   readonly user = this.auth.user;
+  readonly theme = this.themeSvc.theme;
+  toggleTheme(): void { this.themeSvc.toggle(); }
 
   readonly sections: GwSidebarSection[] = [
     {

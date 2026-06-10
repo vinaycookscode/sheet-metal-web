@@ -10,11 +10,13 @@ import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/tabl
 import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
 import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
+import { InvoicePrintPage } from './invoice-print';
 
 @Component({
   selector: 'app-invoice-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwAlertComponent],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwAlertComponent, GwDrawerComponent, InvoicePrintPage],
   templateUrl: './invoice-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -29,6 +31,8 @@ export class InvoiceDetailPage implements OnInit {
   readonly busy = signal(false);
   readonly error = signal('');
   readonly showPay = signal(false);
+  readonly showDoc = signal(false);
+  printDoc(): void { window.print(); }
 
   readonly payForm = this.fb.nonNullable.group({ amount: [0, [Validators.required, Validators.min(0.01)]], method: ['neft'] });
 

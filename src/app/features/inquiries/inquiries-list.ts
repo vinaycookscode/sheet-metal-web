@@ -40,11 +40,13 @@ export class InquiriesListPage implements OnInit {
   readonly customerOptions = signal<GwSelectOption[]>([]);
 
   readonly columns: GwTableColumn[] = [
-    { key: 'number', label: 'Inquiry #', width: '170px' },
+    { key: 'number', label: 'Inquiry #', width: '160px' },
     { key: 'customer', label: 'Customer' },
-    { key: 'status', label: 'Status', width: '120px' },
-    { key: 'requiredDate', label: 'Required', width: '130px' },
-    { key: 'lineCount', label: 'Lines', width: '80px', align: 'right' },
+    { key: 'status', label: 'Status', width: '110px' },
+    { key: 'requiredDate', label: 'Required', width: '120px' },
+    { key: 'lineCount', label: 'Lines', width: '70px', align: 'right' },
+    { key: 'value', label: 'Target value ₹', width: '130px', align: 'right' },
+    { key: 'notes', label: 'Notes' },
   ];
 
   readonly form = this.fb.nonNullable.group({
@@ -69,14 +71,20 @@ export class InquiriesListPage implements OnInit {
         const byId = new Map(customers.map((c) => [c.id, `${c.code} — ${c.name}`]));
         this.customerOptions.set(customers.map((c) => ({ value: c.id, label: `${c.code} — ${c.name}` })));
         this.rows.set(
-          inquiries.map((i) => ({
-            id: i.id,
-            number: i.number,
-            customer: byId.get(i.customerId) ?? i.customerId,
-            status: i.status,
-            requiredDate: i.requiredDate ?? '—',
-            lineCount: i.lines?.length ?? 0,
-          })),
+          inquiries.map((i) => {
+            const lines = i.lines ?? [];
+            const value = lines.reduce((a, l) => a + Number(l.qty ?? 0) * Number(l.targetPrice ?? 0), 0);
+            return {
+              id: i.id,
+              number: i.number,
+              customer: byId.get(i.customerId) ?? i.customerId,
+              status: i.status,
+              requiredDate: i.requiredDate ?? '—',
+              lineCount: lines.length,
+              value: value ? value.toFixed(2) : '—',
+              notes: i.notes ?? '—',
+            };
+          }),
         );
         this.loading.set(false);
       },
