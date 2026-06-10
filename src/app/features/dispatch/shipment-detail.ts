@@ -12,11 +12,12 @@ import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
 import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
 import { ChallanPrintPage } from './challan-print';
+import { CertificatePrintPage } from './certificate-print';
 
 @Component({
   selector: 'app-shipment-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwAlertComponent, GwDrawerComponent, ChallanPrintPage],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwAlertComponent, GwDrawerComponent, ChallanPrintPage, CertificatePrintPage],
   templateUrl: './shipment-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -34,6 +35,7 @@ export class ShipmentDetailPage implements OnInit {
   readonly challan = signal<any>(null);
   readonly showEway = signal(false);
   readonly showDoc = signal(false);
+  readonly showCert = signal(false);
   printDoc(): void { window.print(); }
 
   readonly dispatchForm = this.fb.nonNullable.group({ carrier: [''], trackingNo: [''] });

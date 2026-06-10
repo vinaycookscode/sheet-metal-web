@@ -1,0 +1,76 @@
+@if (loading()) {
+  <p class="status">Loading…</p>
+} @else if (error()) {
+  <p class="status error">{{ error() }}</p>
+} @else if (doc(); as d) {
+  <div class="sheet">
+    <div class="head">
+      <div class="seller">
+        <div class="seller-name">{{ d.seller.name }}</div>
+        @for (l of addrLines(d.seller.address); track l) { <div>{{ l }}</div> }
+        <div class="muted">GSTIN: <strong>{{ d.seller.gstin || '—' }}</strong></div>
+      </div>
+      <div class="title-box">
+        <div class="doc-title">{{ d.title }}</div>
+        <table class="meta">
+          <tr><td>Certificate No.</td><td><strong>{{ d.number }}</strong></td></tr>
+          <tr><td>Date</td><td>{{ d.date | date:'dd MMM yyyy' }}</td></tr>
+          @if (d.refs.salesOrder) { <tr><td>Sales Order</td><td>{{ d.refs.salesOrder }}</td></tr> }
+          @if (d.refs.customerPo) { <tr><td>Customer PO</td><td>{{ d.refs.customerPo }}</td></tr> }
+          <tr><td>Shipment</td><td>{{ d.refs.shipment }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="parties">
+      <div class="party">
+        <div class="party-label">Issued To</div>
+        <div class="party-name">{{ d.buyer.name }}</div>
+        <div class="muted">GSTIN: {{ d.buyer.gstin || '—' }}</div>
+      </div>
+    </div>
+
+    <table class="lines">
+      <thead><tr><th class="r" style="width:32px">#</th><th>Item / Part</th><th class="r" style="width:120px">Quantity</th></tr></thead>
+      <tbody>
+        @for (ln of d.lines; track $index) {
+          <tr><td class="r">{{ $index + 1 }}</td><td>{{ ln.partName }}</td><td class="r">{{ ln.qty }}</td></tr>
+        }
+      </tbody>
+    </table>
+
+    <p class="muted" style="margin-top:16px;font-weight:600">Material Traceability (heat / lot)</p>
+    @if (d.traceability.length) {
+      <table class="lines">
+        <thead><tr><th>Material</th><th style="width:160px">Heat No.</th><th style="width:160px">Lot No.</th></tr></thead>
+        <tbody>
+          @for (t of d.traceability; track $index) {
+            <tr><td>{{ t.item }}</td><td>{{ t.heatNo || '—' }}</td><td>{{ t.lotNo || '—' }}</td></tr>
+          }
+        </tbody>
+      </table>
+    } @else { <p class="muted">No heat/lot-tracked material recorded for this shipment.</p> }
+
+    @if (d.inspections.length) {
+      <p class="muted" style="margin-top:16px;font-weight:600">Inspections</p>
+      <table class="lines">
+        <thead><tr><th>Stage</th><th style="width:160px">Result</th></tr></thead>
+        <tbody>
+          @for (ins of d.inspections; track $index) {
+            <tr><td>{{ label(ins.kind) }}</td><td>{{ label(ins.result) }}</td></tr>
+          }
+        </tbody>
+      </table>
+    }
+
+    <p style="margin-top:20px">{{ d.declaration }}</p>
+
+    <div class="sign">
+      <div class="declaration muted">This certificate is issued without alteration.</div>
+      <div class="sign-box">
+        <div>For <strong>{{ d.seller.name }}</strong></div>
+        <div class="sign-line">Authorised Signatory (QA)</div>
+      </div>
+    </div>
+  </div>
+}

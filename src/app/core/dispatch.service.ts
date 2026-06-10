@@ -14,6 +14,19 @@ export interface ChallanDocument {
   totals: { totalQty: number; totalWeightKg: number | null };
 }
 
+export interface CertificateDocument {
+  title: string;
+  number: string;
+  date: string;
+  seller: { name: string; plant: string; gstin?: string; stateCode?: string; address?: Address };
+  buyer: { name: string; gstin?: string };
+  refs: { shipment: string; salesOrder?: string | null; customerPo?: string | null };
+  lines: Array<{ partName: string; qty: number }>;
+  traceability: Array<{ item: string; heatNo?: string; lotNo?: string }>;
+  inspections: Array<{ kind: string; result: string }>;
+  declaration: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DispatchService {
   private readonly http = inject(HttpClient);
@@ -33,6 +46,7 @@ export class DispatchService {
   }
   challan(id: string) { return this.http.get<any>(`${this.base}/${id}/challan`); }
   document(id: string) { return this.http.get<ChallanDocument>(`${this.base}/${id}/document`); }
+  certificate(id: string) { return this.http.get<CertificateDocument>(`${this.base}/${id}/certificate`); }
   getEway(id: string) { return this.http.get<EwayBill>(`${this.base}/${id}/eway-bill`); }
   genEway(id: string, body: { value: number; distanceKm: number; vehicleNo: string }) {
     return this.http.post<EwayBill>(`${this.base}/${id}/eway-bill`, body);
