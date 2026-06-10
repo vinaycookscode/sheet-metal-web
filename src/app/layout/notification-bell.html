@@ -1,0 +1,25 @@
+<div class="bell">
+  <gw-icon-button icon="Bell" ariaLabel="Notifications" variant="ghost" (click)="toggle()" />
+  @if (unread() > 0) { <span class="bell__badge">{{ unread() > 9 ? '9+' : unread() }}</span> }
+
+  @if (open()) {
+    <div class="bell__backdrop" (click)="open.set(false)"></div>
+    <div class="bell__panel">
+      <div class="bell__head">
+        <span>Notifications</span>
+        @if (unread() > 0) { <button type="button" class="bell__link" (click)="markAll()">Mark all read</button> }
+      </div>
+      @if (!items().length) {
+        <p class="bell__empty">No notifications</p>
+      } @else {
+        @for (n of items(); track n.id) {
+          <button type="button" class="bell__item" [class.bell__item--unread]="!n.isRead" (click)="openItem(n)">
+            <span class="bell__title">{{ n.title }}</span>
+            @if (n.body) { <span class="bell__body">{{ n.body }}</span> }
+            <span class="bell__time">{{ n.createdAt | date:'dd MMM, HH:mm' }}</span>
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

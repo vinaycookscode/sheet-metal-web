@@ -8,11 +8,12 @@ import { GwTopNavComponent } from '../shared/ui/navigation/top-nav/top-nav.compo
 import { GwSidebarComponent, GwSidebarSection } from '../shared/ui/navigation/sidebar/sidebar.component';
 import { GwButtonComponent } from '../shared/ui/buttons/button/button.component';
 import { GwIconButtonComponent } from '../shared/ui/buttons/icon-button/icon-button.component';
+import { NotificationBellComponent } from './notification-bell';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, GwTopNavComponent, GwSidebarComponent, GwButtonComponent, GwIconButtonComponent],
+  imports: [RouterOutlet, GwTopNavComponent, GwSidebarComponent, GwButtonComponent, GwIconButtonComponent, NotificationBellComponent],
   templateUrl: './shell.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

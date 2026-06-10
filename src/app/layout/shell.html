@@ -5,6 +5,7 @@
       <span class="sm-brand__name">Sheet Metal ERP</span>
     </div>
     <div gw-top-nav-right class="sm-topbar-right">
+      <app-notification-bell />
       <gw-icon-button [icon]="theme() === 'dark' ? 'Sun' : 'Moon'" [ariaLabel]="theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'" variant="ghost" (click)="toggleTheme()" />
       <span class="sm-topbar-user">{{ user()?.fullName }}</span>
       <gw-button variant="ghost" size="sm" leadingIcon="LogOut" (click)="logout()">Logout</gw-button>
