@@ -1,0 +1,54 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Users</h1><p class="muted">{{ rows().length }} users</p></div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="showCreate.set(!showCreate())">New user</gw-button>
+  </div>
+
+  @if (error() && !edit()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  @if (showCreate()) {
+    <gw-card padding="lg" class="mb-4">
+      <div class="form-grid" [formGroup]="createForm">
+        <gw-form-field label="Email"><gw-input type="email" formControlName="email" placeholder="user@company.com" /></gw-form-field>
+        <gw-form-field label="Full name"><gw-input formControlName="fullName" /></gw-form-field>
+        <gw-form-field label="Temp password"><gw-input type="password" formControlName="password" /></gw-form-field>
+      </div>
+      <p class="muted mb-2 mt-2">Roles</p>
+      <div class="checks">
+        @for (r of roles(); track r.id) {
+          <label class="chk"><input type="checkbox" [checked]="has(createRoleIds(), r.id)" (change)="toggleCreateRole(r.id, $any($event.target).checked)" /> {{ r.name }}</label>
+        }
+      </div>
+      <div class="form-actions mt-4">
+        <gw-button variant="ghost" (click)="showCreate.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="busy()" [disabled]="createForm.invalid" (click)="create()">Create user</gw-button>
+      </div>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No users" />
+  </gw-card>
+
+  <gw-drawer [open]="!!edit()" size="md" [title]="edit()?.email || 'User'" (openChange)="$event ? null : edit.set(null)">
+    @if (edit(); as u) {
+      @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+      <label class="chk mb-4"><input type="checkbox" [checked]="editActive()" (change)="editActive.set($any($event.target).checked)" /> Active</label>
+      <p class="muted mb-2">Roles</p>
+      <div class="checks mb-4">
+        @for (r of roles(); track r.id) {
+          <label class="chk"><input type="checkbox" [checked]="has(editRoleIds(), r.id)" (change)="toggleEditRole(r.id, $any($event.target).checked)" /> {{ r.name }}</label>
+        }
+      </div>
+      <p class="muted mb-2">Reset password</p>
+      <div class="d-flex gap-2 items-end mb-2">
+        <gw-form-field label="New password" style="flex:1"><gw-input type="password" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" [ngModelOptions]="{standalone:true}" /></gw-form-field>
+        <gw-button variant="secondary" [loading]="busy()" (click)="resetPw()">Reset</gw-button>
+      </div>
+    }
+    <div gw-drawer-footer class="d-flex gap-2" style="justify-content:flex-end">
+      <gw-button variant="ghost" (click)="edit.set(null)">Close</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="saveEdit()">Save</gw-button>
+    </div>
+  </gw-drawer>
+</div>

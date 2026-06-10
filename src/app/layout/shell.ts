@@ -71,6 +71,13 @@ export class ShellComponent {
         { key: 'items', label: 'Items', icon: 'Package', link: '/items' },
       ],
     },
+    {
+      label: 'Administration',
+      items: [
+        { key: 'admin-users', label: 'Users', icon: 'Users', link: '/admin/users' },
+        { key: 'admin-roles', label: 'Roles', icon: 'ShieldCheck', link: '/admin/roles' },
+      ],
+    },
   ];
 
   private readonly url = toSignal(

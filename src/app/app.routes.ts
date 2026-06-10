@@ -38,6 +38,8 @@ export const routes: Routes = [
       { path: 'customers', loadComponent: () => import('./features/customers/customers-page').then((m) => m.CustomersPage) },
       { path: 'suppliers', loadComponent: () => import('./features/suppliers/suppliers-page').then((m) => m.SuppliersPage) },
       { path: 'items', loadComponent: () => import('./features/items/items-page').then((m) => m.ItemsPage) },
+      { path: 'admin/users', loadComponent: () => import('./features/admin/users-page').then((m) => m.AdminUsersPage) },
+      { path: 'admin/roles', loadComponent: () => import('./features/admin/roles-page').then((m) => m.AdminRolesPage) },
     ],
   },
   { path: '**', redirectTo: '' },

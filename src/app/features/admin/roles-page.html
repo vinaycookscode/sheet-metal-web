@@ -1,0 +1,47 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Roles &amp; permissions</h1><p class="muted">{{ rows().length }} roles</p></div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="showCreate.set(!showCreate())">New role</gw-button>
+  </div>
+
+  @if (error() && !edit()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  @if (showCreate()) {
+    <gw-card padding="lg" class="mb-4">
+      <div class="form-grid" [formGroup]="createForm">
+        <gw-form-field label="Code"><gw-input formControlName="code" placeholder="e.g. planner" /></gw-form-field>
+        <gw-form-field label="Name"><gw-input formControlName="name" placeholder="e.g. Production Planner" /></gw-form-field>
+      </div>
+      <div class="form-actions mt-3">
+        <gw-button variant="ghost" (click)="showCreate.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="busy()" [disabled]="createForm.invalid" (click)="create()">Create role</gw-button>
+      </div>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No roles" />
+  </gw-card>
+
+  <gw-drawer [open]="!!edit()" size="lg" [title]="(edit()?.name || 'Role') + ' — permissions'" (openChange)="$event ? null : edit.set(null)">
+    @if (edit()) {
+      @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+      @for (g of groups(); track g.name) {
+        <div class="grp">
+          <div class="grp__h">
+            <label class="chk"><input type="checkbox" (change)="toggleGroup(g, $any($event.target).checked)" /> {{ g.name }}</label>
+          </div>
+          <div class="checks">
+            @for (c of g.codes; track c) {
+              <label class="chk"><input type="checkbox" [checked]="has(c)" (change)="toggle(c, $any($event.target).checked)" /> {{ c }}</label>
+            }
+          </div>
+        </div>
+      }
+    }
+    <div gw-drawer-footer class="d-flex gap-2" style="justify-content:flex-end">
+      <gw-button variant="ghost" (click)="edit.set(null)">Close</gw-button>
+      <gw-button variant="primary" [loading]="busy()" (click)="savePerms()">Save permissions</gw-button>
+    </div>
+  </gw-drawer>
+</div>
