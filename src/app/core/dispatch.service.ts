@@ -27,6 +27,12 @@ export interface CertificateDocument {
   declaration: string;
 }
 
+export interface QualityDossier {
+  shipment: string;
+  inspections: Array<{ id: string; kind: string; result: string; at: string | null }>;
+  documents: Array<{ id: string; kind: string; fileName: string; entityType: string; version: number }>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DispatchService {
   private readonly http = inject(HttpClient);
@@ -47,6 +53,7 @@ export class DispatchService {
   challan(id: string) { return this.http.get<any>(`${this.base}/${id}/challan`); }
   document(id: string) { return this.http.get<ChallanDocument>(`${this.base}/${id}/document`); }
   certificate(id: string) { return this.http.get<CertificateDocument>(`${this.base}/${id}/certificate`); }
+  dossier(id: string) { return this.http.get<QualityDossier>(`${this.base}/${id}/dossier`); }
   getEway(id: string) { return this.http.get<EwayBill>(`${this.base}/${id}/eway-bill`); }
   genEway(id: string, body: { value: number; distanceKm: number; vehicleNo: string }) {
     return this.http.post<EwayBill>(`${this.base}/${id}/eway-bill`, body);

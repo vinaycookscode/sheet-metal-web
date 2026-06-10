@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DispatchService } from '../../core/dispatch.service';
+import { DispatchService, QualityDossier } from '../../core/dispatch.service';
+import { DocumentsService } from '../../core/documents.service';
 import { EwayBill, Shipment } from '../../core/models';
 import { GwCardComponent } from '../../shared/ui/display/card/card.component';
 import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
@@ -17,13 +19,14 @@ import { CertificatePrintPage } from './certificate-print';
 @Component({
   selector: 'app-shipment-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwAlertComponent, GwDrawerComponent, ChallanPrintPage, CertificatePrintPage],
+  imports: [RouterLink, ReactiveFormsModule, DatePipe, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwAlertComponent, GwDrawerComponent, ChallanPrintPage, CertificatePrintPage],
   templateUrl: './shipment-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShipmentDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly svc = inject(DispatchService);
+  private readonly docs = inject(DocumentsService);
   private readonly fb = inject(FormBuilder);
 
   private readonly id = this.route.snapshot.paramMap.get('id')!;
@@ -36,7 +39,22 @@ export class ShipmentDetailPage implements OnInit {
   readonly showEway = signal(false);
   readonly showDoc = signal(false);
   readonly showCert = signal(false);
+  readonly showDossier = signal(false);
+  readonly dossier = signal<QualityDossier | null>(null);
   printDoc(): void { window.print(); }
+
+  openDossier(): void {
+    this.showDossier.set(true);
+    this.dossier.set(null);
+    this.svc.dossier(this.id).subscribe({ next: (d) => this.dossier.set(d), error: () => {} });
+  }
+  downloadDoc(docId: string): void {
+    this.docs.download(docId).subscribe({
+      next: (blob) => { const url = URL.createObjectURL(blob); window.open(url, '_blank'); setTimeout(() => URL.revokeObjectURL(url), 60_000); },
+      error: () => {},
+    });
+  }
+  label(s?: string): string { return (s ?? '').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()); }
 
   readonly dispatchForm = this.fb.nonNullable.group({ carrier: [''], trackingNo: [''] });
   readonly ewayForm = this.fb.nonNullable.group({ value: [60000, Validators.min(1)], distanceKm: [100, Validators.min(1)], vehicleNo: ['', Validators.required] });

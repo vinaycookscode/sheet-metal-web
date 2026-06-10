@@ -14,6 +14,7 @@
         @if (s.status === 'dispatched') {
           <gw-button variant="ghost" leadingIcon="Printer" (click)="showDoc.set(true)">Print Challan</gw-button>
           <gw-button variant="ghost" leadingIcon="ShieldCheck" (click)="showCert.set(true)">Certificate</gw-button>
+          <gw-button variant="ghost" leadingIcon="Layers" (click)="openDossier()">QC dossier</gw-button>
           @if (!eway()) { <gw-button variant="primary" leadingIcon="FileText" (click)="showEway.set(!showEway())">E-way bill</gw-button> }
         }
       </div>
@@ -74,6 +75,33 @@
       <div gw-drawer-footer class="d-flex gap-2" style="justify-content:flex-end">
         <gw-button variant="ghost" (click)="showCert.set(false)">Close</gw-button>
         <gw-button variant="primary" leadingIcon="Printer" (click)="printDoc()">Print / Save PDF</gw-button>
+      </div>
+    </gw-drawer>
+
+    <gw-drawer [open]="showDossier()" size="lg" title="Quality dossier" (openChange)="showDossier.set($event)">
+      @if (dossier(); as d) {
+        <p class="muted mb-2">Inspections</p>
+        @if (!d.inspections.length) { <p class="muted">No inspection records.</p> }
+        @for (ins of d.inspections; track ins.id) {
+          <div class="d-flex items-center gap-2" style="padding:7px 0;border-bottom:1px solid var(--border)">
+            <span>{{ label(ins.kind) }}</span>
+            <gw-badge [variant]="$any(ins.result === 'pass' ? 'success' : ins.result === 'fail' ? 'danger' : 'warning')">{{ ins.result }}</gw-badge>
+            <span class="muted" style="margin-left:auto">{{ ins.at ? (ins.at | date:'dd MMM yyyy') : '—' }}</span>
+          </div>
+        }
+        <p class="muted mb-2 mt-4">Certificates &amp; documents (MTRs / drawings)</p>
+        @if (!d.documents.length) { <p class="muted">No attached documents.</p> }
+        @for (doc of d.documents; track doc.id) {
+          <div class="d-flex items-center gap-2" style="padding:7px 0;border-bottom:1px solid var(--border)">
+            <button type="button" (click)="downloadDoc(doc.id)" style="background:none;border:none;color:var(--color-primary);cursor:pointer;padding:0;font:inherit;text-align:left;flex:1">{{ doc.fileName }}</button>
+            <gw-badge [variant]="$any('neutral')">{{ label(doc.kind) }}</gw-badge>
+            <span class="muted">v{{ doc.version }}</span>
+          </div>
+        }
+      } @else { <p class="muted">Loading…</p> }
+      <div gw-drawer-footer class="d-flex gap-2" style="justify-content:flex-end">
+        <gw-button variant="ghost" (click)="showDossier.set(false)">Close</gw-button>
+        <gw-button variant="secondary" leadingIcon="ShieldCheck" (click)="showDossier.set(false); showCert.set(true)">Open Certificate</gw-button>
       </div>
     </gw-drawer>
   } @else {
