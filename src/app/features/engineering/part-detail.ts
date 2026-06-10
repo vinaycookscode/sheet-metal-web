@@ -9,11 +9,12 @@ import { GwButtonComponent } from '../../shared/ui/buttons/button/button.compone
 import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
 import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/table.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+import { DocumentsPanelComponent } from '../../shared/documents-panel/documents-panel';
 
 @Component({
   selector: 'app-part-detail',
   standalone: true,
-  imports: [RouterLink, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwAlertComponent],
+  imports: [RouterLink, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwAlertComponent, DocumentsPanelComponent],
   templateUrl: './part-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

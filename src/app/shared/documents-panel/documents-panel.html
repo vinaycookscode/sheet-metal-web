@@ -1,0 +1,33 @@
+<div class="docs">
+  @if (error()) { <gw-alert class="mb-2" variant="danger" [title]="error()" /> }
+
+  <div class="docs__upload">
+    <label class="docs__file">
+      <input type="file" (change)="onFile($event)" hidden />
+      <span class="docs__file-btn">Choose file</span>
+      <span class="docs__file-name">{{ fileName() || 'No file selected' }}</span>
+    </label>
+    <select class="docs__kind" (change)="setKind($event)">
+      @for (k of kinds; track k) { <option [value]="k" [selected]="k === kind()">{{ kindLabel(k) }}</option> }
+    </select>
+    <gw-button variant="primary" size="sm" leadingIcon="Plus" [loading]="busy()" [disabled]="!file()" (click)="upload()">Upload</gw-button>
+  </div>
+
+  @if (loading()) {
+    <p class="muted">Loading…</p>
+  } @else if (!docs().length) {
+    <p class="muted">No documents yet.</p>
+  } @else {
+    <ul class="docs__list">
+      @for (d of docs(); track d.id) {
+        <li class="docs__item">
+          <button type="button" class="docs__name" (click)="open(d)">{{ d.fileName }}</button>
+          <gw-badge [variant]="$any('neutral')">{{ kindLabel(d.kind) }}</gw-badge>
+          <span class="muted">v{{ d.version }}</span>
+          <span class="muted">{{ d.createdAt | date:'dd MMM yyyy' }}</span>
+          <gw-button variant="ghost" size="sm" (click)="remove(d)">Delete</gw-button>
+        </li>
+      }
+    </ul>
+  }
+</div>

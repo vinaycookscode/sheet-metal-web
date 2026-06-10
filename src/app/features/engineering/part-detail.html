@@ -42,6 +42,11 @@
         <gw-table [columns]="explodeCols" [data]="explodeRows()" />
       </gw-card>
     }
+
+    <p class="muted mb-2 mt-4">Drawings &amp; documents</p>
+    <gw-card padding="lg">
+      <app-documents-panel entityType="part" [entityId]="p.id" [entityRef]="p.partNo + '-' + p.rev" />
+    </gw-card>
   } @else {
     <gw-alert class="mt-3" variant="danger" title="Part not found" />
   }
