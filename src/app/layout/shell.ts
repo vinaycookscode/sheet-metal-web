@@ -62,6 +62,7 @@ export class ShellComponent {
       label: 'Finance',
       items: [
         { key: 'invoices', label: 'Invoices', icon: 'CreditCard', link: '/invoices' },
+        { key: 'payables', label: 'Payables', icon: 'IndianRupee', link: '/payables' },
         { key: 'closure', label: 'Closure', icon: 'CheckCircle', link: '/closure' },
       ],
     },

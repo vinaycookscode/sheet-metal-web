@@ -15,6 +15,16 @@ export interface ClosureReport {
   totals: { revenue: number; estimatedCost: number; actualMaterial: number; actualLabor: number; actualCost: number; realizedMargin: number; marginPct: number | null };
 }
 
+export interface SupplierInvoiceRow {
+  id: string; supplierRef?: string; invoiceDate: string; subtotal: number; taxTotal: number; grandTotal: number;
+  amountPaid: number; matchStatus: string; status: string; supplier: string; poNumber?: string;
+}
+export interface ApAging {
+  totalOutstanding: number;
+  buckets: { current: number; d31_60: number; d61_90: number; d90plus: number };
+  invoices: Array<{ supplierInvoice: string; supplier: string; invoiceDate: string; outstanding: number; ageDays: number; bucket: string }>;
+}
+
 export interface Address { line1?: string; line2?: string; city?: string; state?: string; pincode?: string; }
 export interface InvoiceDocument {
   title: string;
@@ -51,4 +61,16 @@ export class FinanceService {
 
   closureReport(salesOrderId: string) { return this.http.get<ClosureReport>(`${this.api}/closure/sales-orders/${salesOrderId}`); }
   closeSo(salesOrderId: string) { return this.http.post<ClosureReport>(`${this.api}/closure/sales-orders/${salesOrderId}/close`, {}); }
+
+  // --- Accounts Payable (SM-241/242/243) ---
+  supplierInvoices() { return this.http.get<SupplierInvoiceRow[]>(`${this.api}/supplier-invoices`); }
+  createSupplierInvoice(poId: string, body: { supplierRef?: string; invoiceDate?: string }) {
+    return this.http.post<{ id: string }>(`${this.api}/supplier-invoices/from-po/${poId}`, body);
+  }
+  matchSupplierInvoice(id: string) { return this.http.post<{ receivedValue: number; invoicedValue: number; variance: number; matchStatus: string }>(`${this.api}/supplier-invoices/${id}/match`, {}); }
+  approveSupplierInvoice(id: string) { return this.http.post(`${this.api}/supplier-invoices/${id}/approve`, {}); }
+  recordVendorPayment(body: { supplierInvoiceId?: string; supplierId?: string; amount: number; method?: string; reference?: string }) {
+    return this.http.post(`${this.api}/vendor-payments`, body);
+  }
+  apAging() { return this.http.get<ApAging>(`${this.api}/vendor-payments/ap-aging`); }
 }

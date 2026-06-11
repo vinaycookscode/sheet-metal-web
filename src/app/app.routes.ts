@@ -36,6 +36,7 @@ export const routes: Routes = [
       { path: 'invoices', loadComponent: () => import('./features/finance/invoices-list').then((m) => m.InvoicesListPage) },
       { path: 'invoices/:id', loadComponent: () => import('./features/finance/invoice-detail').then((m) => m.InvoiceDetailPage) },
       { path: 'closure', loadComponent: () => import('./features/finance/closure-page').then((m) => m.ClosurePage) },
+      { path: 'payables', loadComponent: () => import('./features/finance/payables-page').then((m) => m.PayablesPage) },
       { path: 'customers', loadComponent: () => import('./features/customers/customers-page').then((m) => m.CustomersPage) },
       { path: 'suppliers', loadComponent: () => import('./features/suppliers/suppliers-page').then((m) => m.SuppliersPage) },
       { path: 'items', loadComponent: () => import('./features/items/items-page').then((m) => m.ItemsPage) },

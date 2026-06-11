@@ -1,0 +1,53 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Accounts Payable</h1><p class="muted">{{ rows().length }} supplier invoices</p></div>
+  </div>
+
+  @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  <gw-card padding="lg" class="mb-4">
+    <p class="muted mb-2">Capture a vendor bill against a purchase order</p>
+    <div class="d-flex gap-2 items-end" style="max-width:640px">
+      <gw-form-field label="Purchase order" style="flex:1"><gw-select [formControl]="poControl" [options]="pos()" placeholder="Select PO" /></gw-form-field>
+      <gw-form-field label="Vendor invoice no."><gw-input [formControl]="refControl" placeholder="e.g. INV-9931" /></gw-form-field>
+      <gw-button variant="primary" leadingIcon="Plus" [loading]="busy()" [disabled]="!pos().length" (click)="create()">Add bill</gw-button>
+    </div>
+  </gw-card>
+
+  @if (aging(); as ap) {
+    <p class="muted mb-2">AP aging · outstanding ₹{{ ap.totalOutstanding }}</p>
+    <div class="aging">
+      <gw-card padding="lg"><p class="muted">Current</p><h2 style="margin:4px 0">₹{{ ap.buckets.current }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">31–60d</p><h2 style="margin:4px 0">₹{{ ap.buckets.d31_60 }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">61–90d</p><h2 style="margin:4px 0">₹{{ ap.buckets.d61_90 }}</h2></gw-card>
+      <gw-card padding="lg"><p class="muted">90d+</p><h2 style="margin:4px 0">₹{{ ap.buckets.d90plus }}</h2></gw-card>
+    </div>
+    @if (ap.invoices.length) { <gw-card padding="none" class="mb-4"><gw-table [columns]="agingCols" [data]="ap.invoices" /></gw-card> }
+  }
+
+  <p class="muted mb-2">Supplier invoices</p>
+  <gw-card padding="lg">
+    @if (loading()) { <p class="muted">Loading…</p> }
+    @if (!loading() && !rows().length) { <p class="muted">No supplier invoices yet.</p> }
+    @for (r of rows(); track r.id) {
+      <div class="si-row">
+        <div class="si-main">
+          <strong>{{ r.supplier }}</strong> · {{ r.poNumber || '—' }} · {{ r.supplierRef || 'no ref' }}
+          <div class="muted">₹{{ r.grandTotal }} · paid ₹{{ r.amountPaid }}</div>
+        </div>
+        <gw-badge [variant]="$any(matchVariant(r.matchStatus))">{{ r.matchStatus }}</gw-badge>
+        <gw-badge [variant]="$any(statusVariant(r.status))">{{ label(r.status) }}</gw-badge>
+        <gw-button size="sm" variant="ghost" [loading]="busy()" (click)="match(r.id)">Match</gw-button>
+        @if (r.status === 'draft') { <gw-button size="sm" variant="ghost" [loading]="busy()" (click)="approve(r.id)">Approve</gw-button> }
+        @if (r.status === 'approved' || r.status === 'partially_paid') { <gw-button size="sm" variant="secondary" (click)="startPay(r)">Pay</gw-button> }
+      </div>
+      @if (payId() === r.id) {
+        <div class="pay">
+          <gw-input type="number" [formControl]="payAmount" placeholder="Amount" />
+          <gw-button size="sm" variant="primary" [loading]="busy()" (click)="pay()">Record payment</gw-button>
+          <gw-button size="sm" variant="ghost" (click)="payId.set(null)">Cancel</gw-button>
+        </div>
+      }
+    }
+  </gw-card>
+</div>
