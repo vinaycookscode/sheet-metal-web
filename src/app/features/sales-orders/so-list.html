@@ -6,6 +6,6 @@
     </div>
   </div>
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No sales orders yet" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No sales orders yet" emptyHint="Sales orders are created from accepted quotes — open a quote and convert it. From here you engineer parts, run MRP and produce." />
   </gw-card>
 </div>

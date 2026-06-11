@@ -36,6 +36,6 @@
   }
 
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No shipments yet" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No shipments yet" emptyHint="Create a shipment to pack and dispatch completed sales-order lines (passing QC). After dispatch you can invoice and capture proof of delivery." />
   </gw-card>
 </div>

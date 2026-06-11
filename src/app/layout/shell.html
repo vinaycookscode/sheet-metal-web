@@ -21,3 +21,25 @@
     <router-outlet />
   </main>
 </div>
+
+<gw-dialog
+  [open]="showWelcome()"
+  size="md"
+  title="Welcome to Sheet Metal ERP 👋"
+  description="This app runs the whole order journey — from a customer enquiry to a paid, closed job."
+  (openChange)="dismissWelcome()">
+  <div class="sm-welcome">
+    <p>The work flows through four phases:</p>
+    <ol class="sm-welcome__phases">
+      <li><strong>Win the work</strong> — Inquiry → Quote → Sales Order</li>
+      <li><strong>Make it</strong> — Engineering → MRP → Purchasing → Production</li>
+      <li><strong>Assure &amp; ship</strong> — Quality → Dispatch</li>
+      <li><strong>Get paid &amp; close</strong> — Invoice → Payment → Closure</li>
+    </ol>
+    <p class="muted">Every record shows a progress bar and a “Next step” hint, so you always know where you are and what's next.</p>
+  </div>
+  <div gw-dialog-footer class="d-flex gap-2" style="justify-content:flex-end">
+    <gw-button variant="ghost" (click)="dismissWelcome()">Explore on my own</gw-button>
+    <gw-button variant="primary" leadingIcon="Compass" (click)="startGuide()">Show me the flow</gw-button>
+  </div>
+</gw-dialog>

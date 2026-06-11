@@ -1,0 +1,36 @@
+<div class="page gs">
+  <div class="page-header">
+    <div>
+      <h1>Getting Started</h1>
+      <p class="muted">How an order flows through the plant — click any stage to jump in.</p>
+    </div>
+  </div>
+
+  @for (phase of phases; track phase.label; let last = $last) {
+    <div class="gs-phase">
+      <div class="gs-phase__head">
+        <span class="gs-phase__label">{{ phase.label }}</span>
+        <span class="muted">{{ phase.hint }}</span>
+      </div>
+      <div class="gs-grid">
+        @for (s of phase.stages; track s.n) {
+          <a [routerLink]="s.link" class="gs-card">
+            <gw-card padding="lg">
+              <div class="gs-card__top">
+                <span class="gs-card__num">{{ s.n }}</span>
+                <lucide-icon [name]="s.icon" [size]="20" class="gs-card__icon" />
+              </div>
+              <div class="gs-card__title">{{ s.title }}</div>
+              <div class="gs-card__desc">{{ s.desc }}</div>
+            </gw-card>
+          </a>
+        }
+      </div>
+    </div>
+    @if (!last) { <div class="gs-arrow" aria-hidden="true">↓</div> }
+  }
+
+  <gw-card padding="lg" class="gs-foot">
+    <p class="muted">New here? Work top to bottom: start by creating an <a routerLink="/inquiries">Inquiry</a>, or watch how stages connect — each record shows a progress bar and a “Next step” hint.</p>
+  </gw-card>
+</div>

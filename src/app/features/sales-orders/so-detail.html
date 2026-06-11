@@ -21,6 +21,12 @@
 
     @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
 
+    @if (!soCancelled()) {
+      <gw-card padding="lg" class="mb-4">
+        <app-lifecycle-stepper [stages]="soStages" [current]="soStageIndex()" [next]="soNext()" />
+      </gw-card>
+    }
+
     <gw-card padding="lg" class="mb-4">
       @if (editing()) {
         <div class="form-grid" [formGroup]="editForm">

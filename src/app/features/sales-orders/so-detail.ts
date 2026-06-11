@@ -16,6 +16,7 @@ import { GwSelectComponent, GwSelectOption } from '../../shared/ui/forms/select/
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
 import { AuditPanelComponent } from '../../shared/audit-panel/audit-panel';
 import { DocumentsPanelComponent } from '../../shared/documents-panel/documents-panel';
+import { LifecycleStepperComponent } from '../../shared/lifecycle-stepper/lifecycle-stepper';
 
 const NEXT: Record<string, string[]> = {
   confirmed: ['in_production', 'cancelled'],
@@ -31,7 +32,7 @@ const humanize = (s: string): string => s.replace(/_/g, ' ').replace(/\b\w/g, (c
 @Component({
   selector: 'app-so-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwAlertComponent, AuditPanelComponent, DocumentsPanelComponent],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwAlertComponent, AuditPanelComponent, DocumentsPanelComponent, LifecycleStepperComponent],
   templateUrl: './so-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -58,6 +59,20 @@ export class SoDetailPage implements OnInit {
   readonly nextStatuses = computed(() => NEXT[this.order()?.status ?? ''] ?? []);
   readonly openLines = computed<SoLine[]>(() => (this.order()?.lines ?? []).filter((l) => l.status === 'open'));
   readonly lineRows = computed(() => (this.order()?.lines ?? []).map((l) => ({ ...l, status: humanize(l.status) })));
+
+  // Lifecycle stepper (SM onboarding) — order's own journey.
+  readonly soStages = ['Confirmed', 'In production', 'Dispatched', 'Invoiced', 'Closed'];
+  private readonly STAGE_IDX: Record<string, number> = { confirmed: 0, in_production: 1, dispatched: 2, invoiced: 3, closed: 4 };
+  private readonly NEXT_HINT: Record<string, string> = {
+    confirmed: 'Release parts to planning (Engineering), then run MRP to create work orders.',
+    in_production: 'Finish the work orders, then pack & dispatch the shipment.',
+    dispatched: 'Raise the GST invoice for the dispatched goods.',
+    invoiced: 'Record the customer payment, then run the closure checklist.',
+    closed: 'Order complete.',
+  };
+  readonly soStageIndex = computed(() => this.STAGE_IDX[this.order()?.status ?? ''] ?? -1);
+  readonly soNext = computed(() => this.NEXT_HINT[this.order()?.status ?? '']);
+  readonly soCancelled = computed(() => this.order()?.status === 'cancelled');
 
   readonly columns: GwTableColumn[] = [
     { key: 'lineNo', label: '#', width: '60px' },

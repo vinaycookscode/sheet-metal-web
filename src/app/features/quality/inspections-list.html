@@ -36,6 +36,6 @@
   }
 
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No inspections yet" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No inspections yet" emptyHint="Record incoming (material), in-process and final inspections. A clear final inspection is required before a line can be dispatched." />
   </gw-card>
 </div>

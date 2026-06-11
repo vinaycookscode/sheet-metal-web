@@ -53,6 +53,6 @@
   }
 
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No parts yet" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No parts yet" emptyHint="Define a part's routing (operations) and BOM, then release it to planning — that's what lets MRP create work orders and requisitions." />
   </gw-card>
 </div>

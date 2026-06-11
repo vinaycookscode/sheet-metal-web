@@ -47,6 +47,6 @@
   }
 
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No inquiries yet" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No inquiries yet" emptyHint="This is where the flow starts — create an inquiry to capture a customer enquiry and the parts to quote. It then feeds estimation and quoting." />
   </gw-card>
 </div>

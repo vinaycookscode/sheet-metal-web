@@ -6,6 +6,6 @@
     </div>
   </div>
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No quotes yet" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No quotes yet" emptyHint="Quotes come from inquiries — open an inquiry, send it to estimation, then create a quote. An accepted quote becomes a sales order." />
   </gw-card>
 </div>

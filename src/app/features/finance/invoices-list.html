@@ -31,6 +31,6 @@
 
   <p class="muted mb-2">All invoices</p>
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No invoices yet" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No invoices yet" emptyHint="Raise a GST invoice from a dispatched shipment to bill the customer, then record payments against it." />
   </gw-card>
 </div>

@@ -34,6 +34,6 @@
   }
 
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No purchase orders yet" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No purchase orders yet" emptyHint="POs are raised from purchase requisitions (created by MRP) or by awarding an RFQ. Receiving against a PO (GRN) posts material into stock." />
   </gw-card>
 </div>

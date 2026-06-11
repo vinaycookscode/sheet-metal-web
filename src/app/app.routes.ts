@@ -13,6 +13,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard-page').then((m) => m.DashboardPage) },
+      { path: 'getting-started', loadComponent: () => import('./features/getting-started/getting-started').then((m) => m.GettingStartedPage) },
       { path: 'kpis', loadComponent: () => import('./features/analytics/kpi-dashboard').then((m) => m.KpiDashboardPage) },
       { path: 'inquiries', loadComponent: () => import('./features/inquiries/inquiries-list').then((m) => m.InquiriesListPage) },
       { path: 'inquiries/:id', loadComponent: () => import('./features/inquiries/inquiry-detail').then((m) => m.InquiryDetailPage) },

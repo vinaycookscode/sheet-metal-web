@@ -11,6 +11,6 @@
   @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
 
   <gw-card padding="none">
-    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No work orders — run MRP on released SO lines" />
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)" emptyText="No work orders yet" emptyHint="Work orders are planned by MRP from released sales-order lines. Release a part to planning on a sales order, then run MRP." />
   </gw-card>
 </div>

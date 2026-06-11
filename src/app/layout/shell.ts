@@ -10,11 +10,12 @@ import { GwButtonComponent } from '../shared/ui/buttons/button/button.component'
 import { GwIconButtonComponent } from '../shared/ui/buttons/icon-button/icon-button.component';
 import { NotificationBellComponent } from './notification-bell';
 import { ScanBoxComponent } from './scan-box';
+import { GwDialogComponent } from '../shared/ui/overlays/dialog/dialog.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, GwTopNavComponent, GwSidebarComponent, GwButtonComponent, GwIconButtonComponent, NotificationBellComponent, ScanBoxComponent],
+  imports: [RouterOutlet, GwTopNavComponent, GwSidebarComponent, GwButtonComponent, GwIconButtonComponent, NotificationBellComponent, ScanBoxComponent, GwDialogComponent],
   templateUrl: './shell.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,6 +31,7 @@ export class ShellComponent {
   readonly sections: GwSidebarSection[] = [
     {
       items: [
+        { key: 'getting-started', label: 'Getting Started', icon: 'Compass', link: '/getting-started' },
         { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', link: '/dashboard' },
         { key: 'kpis', label: 'Management KPIs', icon: 'TrendingUp', link: '/kpis' },
       ],
@@ -107,6 +109,17 @@ export class ShellComponent {
         this.flashTimer = setTimeout(() => this.flash.set(false), 1800);
       }
     });
+  }
+
+  /** First-login welcome (onboarding) — shown once, then remembered. */
+  readonly showWelcome = signal(typeof localStorage !== 'undefined' && !localStorage.getItem('sm_welcomed'));
+  dismissWelcome(): void {
+    try { localStorage.setItem('sm_welcomed', '1'); } catch { /* ignore */ }
+    this.showWelcome.set(false);
+  }
+  startGuide(): void {
+    this.dismissWelcome();
+    this.router.navigate(['/getting-started']);
   }
 
   logout(): void {

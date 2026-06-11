@@ -63,7 +63,10 @@
       } @else {
         <tr class="gw-table__row gw-table__row--empty">
           <td class="gw-table__empty-cell" [attr.colspan]="columns.length">
-            <div class="gw-table__empty-default">{{ emptyText }}</div>
+            <div class="gw-table__empty-default">
+              <div class="gw-table__empty-title">{{ emptyText }}</div>
+              @if (emptyHint) { <div class="gw-table__empty-hint">{{ emptyHint }}</div> }
+            </div>
           </td>
         </tr>
       }

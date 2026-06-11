@@ -65,6 +65,8 @@ export class GwTableComponent<T = any> {
   /** Field on the row to use as a unique id. */
   @Input() trackBy: string | null = null;
   @Input() emptyText = 'No results';
+  /** Optional guidance shown under the empty title (e.g. how this list gets populated). */
+  @Input() emptyHint?: string;
   /** Client-side: make every column sortable and sort the data in-place. On by default. */
   @Input() autoSort = true;
   /** Client-side pagination page size (0 = off). Defaults to 25. */
