@@ -1,0 +1,30 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Capacity</h1>
+      <p class="muted">Load vs capacity per work center · earliest-finish vs promised</p>
+    </div>
+    <gw-button variant="ghost" leadingIcon="RefreshCw" (click)="load()">Refresh</gw-button>
+  </div>
+
+  <p class="muted mb-2">Work-center load</p>
+  <div class="wc-grid">
+    @for (w of board(); track w.code) {
+      <gw-card padding="lg" class="wc">
+        <div class="wc__head">
+          <span class="wc__name">{{ w.code }}</span>
+          @if (w.overloaded) { <gw-badge variant="danger">Bottleneck</gw-badge> }
+          @else if (w.isOutside) { <gw-badge [variant]="$any('neutral')">Outside</gw-badge> }
+        </div>
+        <div class="wc__bar"><div class="wc__fill" [class.wc__fill--over]="w.overloaded" [style.width.%]="fillPct(w)"></div></div>
+        <div class="wc__meta">{{ w.loadHrs }} h queued · {{ w.capacityHrsPerDay }} h/day · ~{{ w.backlogDays }} day backlog · {{ w.queuedOps }} ops</div>
+      </gw-card>
+    }
+    @if (!board().length && !loading()) { <p class="muted">No work centers.</p> }
+  </div>
+
+  <p class="muted mb-2">Schedule (open work orders)</p>
+  <gw-card padding="none">
+    <gw-table [columns]="scheduleCols" [data]="scheduleRows()" [loading]="loading()" emptyText="No open work orders" />
+  </gw-card>
+</div>

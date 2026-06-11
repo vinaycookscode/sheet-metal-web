@@ -44,6 +44,7 @@ export class ShellComponent {
       items: [
         { key: 'parts', label: 'Engineering', icon: 'Settings', link: '/parts' },
         { key: 'work-orders', label: 'Work Orders', icon: 'ClipboardCheck', link: '/work-orders' },
+        { key: 'capacity', label: 'Capacity', icon: 'Gauge', link: '/capacity' },
         { key: 'production-board', label: 'Production', icon: 'LayoutGrid', link: '/production-board' },
         { key: 'purchase-orders', label: 'Purchasing', icon: 'Receipt', link: '/purchase-orders' },
         { key: 'stock', label: 'Inventory', icon: 'Warehouse', link: '/stock' },

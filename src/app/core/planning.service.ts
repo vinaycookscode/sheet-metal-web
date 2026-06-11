@@ -3,10 +3,22 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { MrpResult, PurchaseRequisition, WorkOrder } from './models';
 
+export interface CapacityRow {
+  code: string; name: string; isOutside: boolean; queuedOps: number;
+  loadHrs: number; capacityHrsPerDay: number; backlogDays: number; overloaded: boolean;
+}
+export interface ScheduleRow {
+  number: string; partNo: string; status: string; promisedDate: string | null;
+  totalHrs: number; plannedFinish: string; late: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PlanningService {
   private readonly http = inject(HttpClient);
   private readonly api = environment.apiUrl;
+
+  capacityBoard() { return this.http.get<CapacityRow[]>(`${this.api}/capacity`); }
+  schedule() { return this.http.get<ScheduleRow[]>(`${this.api}/schedule`); }
 
   runMrp() { return this.http.post<MrpResult>(`${this.api}/mrp/run`, {}); }
   workOrders(status?: string) {

@@ -27,6 +27,7 @@ export const routes: Routes = [
       { path: 'purchase-orders', loadComponent: () => import('./features/procurement/po-list').then((m) => m.PoListPage) },
       { path: 'purchase-orders/:id', loadComponent: () => import('./features/procurement/po-detail').then((m) => m.PoDetailPage) },
       { path: 'stock', loadComponent: () => import('./features/inventory/stock-page').then((m) => m.StockPage) },
+      { path: 'capacity', loadComponent: () => import('./features/planning/capacity-page').then((m) => m.CapacityPage) },
       { path: 'inspections', loadComponent: () => import('./features/quality/inspections-list').then((m) => m.InspectionsListPage) },
       { path: 'inspections/:id', loadComponent: () => import('./features/quality/inspection-detail').then((m) => m.InspectionDetailPage) },
       { path: 'ncrs', loadComponent: () => import('./features/quality/ncrs-list').then((m) => m.NcrsListPage) },
