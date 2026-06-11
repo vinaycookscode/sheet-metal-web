@@ -163,6 +163,7 @@ export interface Ncr {
 export interface PackingLine { id: string; soLineId: string; qty: number; boxNo?: string; weightKg?: number; }
 export interface Shipment {
   id: string; number: string; salesOrderId: string; status: string; dispatchDate?: string; carrier?: string; trackingNo?: string; totalWeightKg?: number; lines?: PackingLine[]; createdAt: string;
+  acceptedAt?: string; acceptedBy?: string; acceptanceNote?: string;
 }
 export interface EwayBill { id: string; shipmentId: string; ewbNumber?: string; value?: number; distanceKm?: number; vehicleNo?: string; payload?: Record<string, unknown>; generatedAt?: string; }
 

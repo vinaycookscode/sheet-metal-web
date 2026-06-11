@@ -14,7 +14,7 @@ import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component
   standalone: true,
   imports: [ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwTableComponent, GwFormFieldComponent, GwSelectComponent, GwAlertComponent],
   templateUrl: './closure-page.html',
-  styles: [`.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}`],
+  styles: [`.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.chk{display:flex;align-items:center;gap:10px;padding:6px 0}.chk__mark{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;flex:none}.chk__mark--ok{background:var(--color-success,#16a34a)}.chk__mark--no{background:var(--surface-input);color:var(--text-secondary)}`],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClosurePage implements OnInit {

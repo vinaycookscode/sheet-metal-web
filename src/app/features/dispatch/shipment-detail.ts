@@ -58,6 +58,8 @@ export class ShipmentDetailPage implements OnInit {
 
   readonly dispatchForm = this.fb.nonNullable.group({ carrier: [''], trackingNo: [''] });
   readonly ewayForm = this.fb.nonNullable.group({ value: [60000, Validators.min(1)], distanceKm: [100, Validators.min(1)], vehicleNo: ['', Validators.required] });
+  readonly acceptForm = this.fb.nonNullable.group({ acceptedBy: ['', Validators.required], note: [''] });
+  readonly showAccept = signal(false);
 
   readonly lineCols: GwTableColumn[] = [
     { key: 'qty', label: 'Qty', width: '120px', align: 'right' },
@@ -76,6 +78,11 @@ export class ShipmentDetailPage implements OnInit {
 
   pack(): void { this.act(this.svc.pack(this.id)); }
   dispatch(): void { this.act(this.svc.dispatch(this.id, { carrier: this.dispatchForm.value.carrier || undefined, trackingNo: this.dispatchForm.value.trackingNo || undefined })); }
+  accept(): void {
+    if (this.acceptForm.invalid) { this.error.set('Enter who accepted the delivery'); return; }
+    this.act(this.svc.accept(this.id, { acceptedBy: this.acceptForm.value.acceptedBy!, note: this.acceptForm.value.note || undefined }));
+    this.showAccept.set(false);
+  }
 
   private act(obs: ReturnType<DispatchService['pack']>): void {
     this.busy.set(true);

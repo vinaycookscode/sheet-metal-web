@@ -50,6 +50,9 @@ export class DispatchService {
   dispatch(id: string, body: { carrier?: string; trackingNo?: string; freightCost?: number }) {
     return this.http.post<Shipment>(`${this.base}/${id}/dispatch`, body);
   }
+  accept(id: string, body: { acceptedBy: string; note?: string; date?: string }) {
+    return this.http.post<Shipment>(`${this.base}/${id}/accept`, body);
+  }
   challan(id: string) { return this.http.get<any>(`${this.base}/${id}/challan`); }
   document(id: string) { return this.http.get<ChallanDocument>(`${this.base}/${id}/document`); }
   certificate(id: string) { return this.http.get<CertificateDocument>(`${this.base}/${id}/certificate`); }

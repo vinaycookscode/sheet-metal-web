@@ -9,8 +9,10 @@ export interface ArAging {
   buckets: { current: number; d31_60: number; d61_90: number; d90plus: number };
   invoices: Array<{ invoice: string; customer: string; invoiceDate: string; outstanding: number; ageDays: number; bucket: string }>;
 }
+export interface ClosureChecklist { allShipped: boolean; invoiced: boolean; paid: boolean; accepted: boolean; qcClear: boolean; readyToClose: boolean; }
 export interface ClosureReport {
   salesOrder: string; status: string;
+  checklist: ClosureChecklist;
   lines: Array<{ partName: string; revenue: number; estimatedCost: number; actualMaterial: number; actualLabor: number; actualCost: number; margin: number; variance: number }>;
   totals: { revenue: number; estimatedCost: number; actualMaterial: number; actualLabor: number; actualCost: number; realizedMargin: number; marginPct: number | null };
 }

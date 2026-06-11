@@ -12,12 +12,33 @@
     <div class="d-flex gap-2 items-end" style="max-width:560px">
       <gw-form-field label="Sales order" style="flex:1"><gw-select [formControl]="soControl" [options]="soOptions()" placeholder="Select a sales order" /></gw-form-field>
       <gw-button variant="secondary" [loading]="busy()" (click)="view()">View report</gw-button>
-      <gw-button variant="primary" [loading]="busy()" (click)="close()">Close project</gw-button>
+      <gw-button variant="primary" [loading]="busy()" [disabled]="!(report()?.checklist?.readyToClose)" (click)="close()">Close project</gw-button>
     </div>
   </gw-card>
 
   @if (report(); as r) {
     <p class="muted mb-2">{{ r.salesOrder }} · status {{ r.status }}</p>
+
+    @if (r.checklist; as c) {
+      <p class="muted mb-2">Closure checklist</p>
+      <gw-card padding="lg" class="mb-4">
+        @for (item of [
+          { ok: c.allShipped, label: 'All order lines shipped' },
+          { ok: c.invoiced, label: 'Invoice raised' },
+          { ok: c.paid, label: 'Payment fully received' },
+          { ok: c.accepted, label: 'Customer acceptance (POD) recorded' },
+          { ok: c.qcClear, label: 'No open NCRs' }
+        ]; track item.label) {
+          <div class="chk">
+            <span class="chk__mark" [class.chk__mark--ok]="item.ok" [class.chk__mark--no]="!item.ok">{{ item.ok ? '✓' : '○' }}</span>
+            <span>{{ item.label }}</span>
+          </div>
+        }
+        @if (!c.readyToClose) { <p class="muted mt-2">Complete every item above to enable closing.</p> }
+        @else if (r.status !== 'closed') { <p class="mt-2" style="color:var(--color-success,#16a34a)">Ready to close.</p> }
+      </gw-card>
+    }
+
     <div class="totals mb-4">
       <gw-card padding="lg"><p class="muted">Revenue</p><h2 style="margin:4px 0">₹{{ r.totals.revenue }}</h2></gw-card>
       <gw-card padding="lg"><p class="muted">Estimated cost</p><h2 style="margin:4px 0">₹{{ r.totals.estimatedCost }}</h2></gw-card>

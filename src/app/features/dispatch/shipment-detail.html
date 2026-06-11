@@ -11,16 +11,34 @@
       </div>
       <div class="d-flex gap-2">
         @if (s.status === 'draft') { <gw-button variant="secondary" [loading]="busy()" (click)="pack()">Pack</gw-button> }
-        @if (s.status === 'dispatched') {
+        @if (s.status === 'dispatched' || s.status === 'delivered') {
           <gw-button variant="ghost" leadingIcon="Printer" (click)="showDoc.set(true)">Print Challan</gw-button>
           <gw-button variant="ghost" leadingIcon="ShieldCheck" (click)="showCert.set(true)">Certificate</gw-button>
           <gw-button variant="ghost" leadingIcon="Layers" (click)="openDossier()">QC dossier</gw-button>
-          @if (!eway()) { <gw-button variant="primary" leadingIcon="FileText" (click)="showEway.set(!showEway())">E-way bill</gw-button> }
+        }
+        @if (s.status === 'dispatched') {
+          @if (!eway()) { <gw-button variant="ghost" leadingIcon="FileText" (click)="showEway.set(!showEway())">E-way bill</gw-button> }
+          <gw-button variant="primary" leadingIcon="CheckCircle" (click)="showAccept.set(!showAccept())">Record acceptance</gw-button>
         }
       </div>
     </div>
 
     @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+    @if (s.acceptedAt) {
+      <gw-alert class="mb-4" variant="success" [title]="'Accepted by ' + s.acceptedBy + ' on ' + (s.acceptedAt | date:'dd MMM yyyy') + (s.acceptanceNote ? ' — ' + s.acceptanceNote : '')" />
+    }
+
+    @if (showAccept() && s.status === 'dispatched') {
+      <gw-card padding="lg" class="mb-4">
+        <p class="muted mb-2">Customer acceptance / proof of delivery</p>
+        <div class="d-flex gap-2 items-end" [formGroup]="acceptForm">
+          <gw-form-field label="Accepted by"><gw-input formControlName="acceptedBy" placeholder="Name / designation" /></gw-form-field>
+          <gw-form-field label="Note" style="flex:1"><gw-input formControlName="note" placeholder="Condition / remarks (optional)" /></gw-form-field>
+          <gw-button variant="primary" leadingIcon="CheckCircle" [loading]="busy()" (click)="accept()">Confirm acceptance</gw-button>
+        </div>
+      </gw-card>
+    }
 
     @if (s.status === 'packed') {
       <gw-card padding="lg" class="mb-4">
