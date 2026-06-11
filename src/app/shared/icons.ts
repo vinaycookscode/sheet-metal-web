@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import {
-  LayoutDashboard, Users, Calendar, FileText, Receipt,
+  LayoutDashboard, Users, Calendar, FileText, Receipt, FileSearch, Award,
   Settings, Stethoscope, LogOut, Search, Bell, Plus,
   Eye, EyeOff, Trash2, ChevronLeft, ChevronRight,
   X, UserPlus, Mail, AlertCircle, CheckCircle2,
@@ -52,7 +52,7 @@ import {
 @NgModule({
   imports: [
     LucideAngularModule.pick({
-      LayoutDashboard, Users, Calendar, FileText, Receipt,
+      LayoutDashboard, Users, Calendar, FileText, Receipt, FileSearch, Award,
       Settings, Stethoscope, LogOut, Search, Bell, Plus,
       Eye, EyeOff, Trash2, ChevronLeft, ChevronRight,
       X, UserPlus, Mail, AlertCircle, CheckCircle2,

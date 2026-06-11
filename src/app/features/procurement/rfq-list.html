@@ -1,0 +1,42 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>RFQs</h1><p class="muted">{{ rows().length }} requests for quotation</p></div>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="showCreate.set(!showCreate())">New RFQ</gw-button>
+  </div>
+
+  @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+  @if (showCreate()) {
+    <gw-card padding="lg" class="mb-4" [formGroup]="form">
+      <p class="muted mb-2">New request for quotation</p>
+      @for (ln of lines.controls; track $index) {
+        <div class="line-row" [formGroup]="$any(ln)">
+          <gw-form-field label="Item" style="flex:1"><gw-select formControlName="itemId" [options]="items()" placeholder="Select item" /></gw-form-field>
+          <gw-form-field label="Qty"><gw-input type="number" formControlName="qty" /></gw-form-field>
+          <gw-button variant="ghost" size="sm" (click)="removeLine($index)">Remove</gw-button>
+        </div>
+      }
+      <gw-button variant="ghost" size="sm" leadingIcon="Plus" (click)="addLine()">Add line</gw-button>
+      <gw-form-field label="Notes" class="mt-2"><gw-input formControlName="notes" placeholder="Optional" /></gw-form-field>
+      <div class="d-flex gap-2 mt-2">
+        <gw-button variant="primary" [loading]="busy()" (click)="create()">Create RFQ</gw-button>
+        <gw-button variant="ghost" (click)="showCreate.set(false)">Cancel</gw-button>
+      </div>
+    </gw-card>
+  }
+
+  <gw-card padding="lg">
+    @if (loading()) { <p class="muted">Loading…</p> }
+    @if (!loading() && !rows().length) { <p class="muted">No RFQs yet.</p> }
+    @for (r of rows(); track r.id) {
+      <div class="rfq-row">
+        <div class="rfq-main">
+          <a [routerLink]="['/rfqs', r.id]"><strong>{{ r.number }}</strong></a>
+          <div class="muted">{{ r.lineCount }} items{{ r.notes ? ' · ' + r.notes : '' }}</div>
+        </div>
+        <gw-badge [variant]="$any(statusVariant(r.status))">{{ r.status }}</gw-badge>
+        <gw-button size="sm" variant="ghost" [routerLink]="['/rfqs', r.id]">Open</gw-button>
+      </div>
+    }
+  </gw-card>
+</div>

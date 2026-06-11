@@ -1,0 +1,59 @@
+<div class="page">
+  @if (rfq(); as r) {
+    <div class="page-header">
+      <div>
+        <a routerLink="/rfqs" class="muted">← RFQs</a>
+        <h1>{{ r.number }} <gw-badge [variant]="$any(statusVariant(r.status))">{{ r.status }}</gw-badge></h1>
+        @if (r.notes) { <p class="muted">{{ r.notes }}</p> }
+      </div>
+    </div>
+
+    @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+    <p class="muted mb-2">Quote comparison</p>
+    <gw-card padding="lg" class="mb-4">
+      @if (!comparison().length) { <p class="muted">No lines.</p> }
+      @for (l of comparison(); track l.id) {
+        <div class="cmp-line">
+          <strong>{{ l.itemCode }}</strong> — {{ l.itemName }} · qty {{ l.qty }}
+          @if (!l.quotes.length) { <div class="muted" style="padding-left:12px">No quotes yet</div> }
+          @for (q of l.quotes; track q.id) {
+            <div class="q" [class.q--best]="q.best">
+              <span>{{ q.supplier }}</span>
+              <span class="q-spacer"></span>
+              <span class="muted">{{ q.leadDays }}d lead</span>
+              <span>₹{{ q.unitPrice }} × {{ l.qty }} = <strong>₹{{ q.extended }}</strong></span>
+              @if (q.best) { <gw-badge variant="success">Best</gw-badge> }
+            </div>
+          }
+        </div>
+      }
+    </gw-card>
+
+    @if (r.status === 'open') {
+      <p class="muted mb-2">Add a vendor quote</p>
+      <gw-card padding="lg" class="mb-4">
+        <div class="addq">
+          <gw-form-field label="Line" style="min-width:220px"><gw-select [formControl]="$any(quoteForm.controls.rfqLineId)" [options]="lineOpts()" placeholder="Item" /></gw-form-field>
+          <gw-form-field label="Supplier" style="min-width:200px"><gw-select [formControl]="$any(quoteForm.controls.supplierId)" [options]="suppliers()" placeholder="Supplier" /></gw-form-field>
+          <gw-form-field label="Unit price ₹"><gw-input type="number" [formControl]="$any(quoteForm.controls.unitPrice)" /></gw-form-field>
+          <gw-form-field label="Lead (days)"><gw-input type="number" [formControl]="$any(quoteForm.controls.leadDays)" /></gw-form-field>
+          <gw-button variant="primary" [loading]="busy()" (click)="addQuote()">Add quote</gw-button>
+        </div>
+      </gw-card>
+
+      <p class="muted mb-2">Award</p>
+      <gw-card padding="lg">
+        <div class="d-flex gap-2 items-end" style="max-width:480px">
+          <gw-form-field label="Award to supplier" style="flex:1"><gw-select [formControl]="awardSupplier" [options]="suppliers()" placeholder="Select winning supplier" /></gw-form-field>
+          <gw-button variant="primary" leadingIcon="Award" [loading]="busy()" (click)="award()">Award → PO</gw-button>
+        </div>
+        <p class="muted mt-2" style="font-size:12px">Creates a purchase order from the selected supplier's quoted lines.</p>
+      </gw-card>
+    } @else {
+      <gw-card padding="lg"><p class="muted">This RFQ has been {{ r.status }}.</p></gw-card>
+    }
+  } @else if (loading()) {
+    <p class="muted">Loading…</p>
+  }
+</div>
