@@ -29,7 +29,10 @@ export class ShellComponent {
 
   readonly sections: GwSidebarSection[] = [
     {
-      items: [{ key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', link: '/dashboard' }],
+      items: [
+        { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', link: '/dashboard' },
+        { key: 'kpis', label: 'Management KPIs', icon: 'TrendingUp', link: '/kpis' },
+      ],
     },
     {
       label: 'Sales',

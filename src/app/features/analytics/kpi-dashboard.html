@@ -1,0 +1,25 @@
+<div class="page">
+  <div class="page-header">
+    <div><h1>Management KPIs</h1><p class="muted">Plant-wide snapshot &amp; order profitability</p></div>
+    <gw-button variant="ghost" leadingIcon="RefreshCw" (click)="load()">Refresh</gw-button>
+  </div>
+
+  @if (kpis(); as k) {
+    <div class="kpis">
+      <gw-card padding="lg" class="kpi"><p class="muted">Revenue (invoiced)</p><h2>₹{{ k.revenue }}</h2></gw-card>
+      <gw-card padding="lg" class="kpi"><p class="muted">AR outstanding</p><h2>₹{{ k.arOutstanding }}</h2><span class="sub">money owed to us</span></gw-card>
+      <gw-card padding="lg" class="kpi"><p class="muted">AP outstanding</p><h2>₹{{ k.apOutstanding }}</h2><span class="sub">money we owe</span></gw-card>
+      <gw-card padding="lg" class="kpi"><p class="muted">Open work orders</p><h2>{{ k.openWorkOrders }}</h2></gw-card>
+      <gw-card padding="lg" class="kpi"><p class="muted">Open NCRs</p><h2>{{ k.openNcrs }}</h2></gw-card>
+      <gw-card padding="lg" class="kpi"><p class="muted">Open orders</p><h2>{{ k.openOrders }}</h2></gw-card>
+      <gw-card padding="lg" class="kpi"><p class="muted">Win rate</p><h2>{{ k.winRatePct ?? '—' }}%</h2><span class="sub">{{ k.orders }} orders / {{ k.quotes }} quotes</span></gw-card>
+    </div>
+  }
+
+  @if (profit(); as p) {
+    <p class="muted mb-2">Order profitability · total margin ₹{{ p.totals.margin }} ({{ p.totals.marginPct ?? '—' }}%)</p>
+    <gw-card padding="none">
+      <gw-table [columns]="cols" [data]="p.orders" [loading]="loading()" emptyText="No orders" />
+    </gw-card>
+  }
+</div>
