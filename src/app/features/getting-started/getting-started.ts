@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, OnDestro
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 
-interface Stage { n: number; title: string; desc: string; icon: string; link: string; phase: string; }
+interface Stage { n: number; title: string; desc: string; icon: string; link: string; phase: string; cls: string; }
 interface Conn { x1: number; y1: number; x2: number; y2: number; }
 interface Dot { x: number; y: number; }
 
@@ -16,18 +16,18 @@ interface Dot { x: number; y: number; }
 })
 export class GettingStartedPage implements AfterViewInit, OnDestroy {
   readonly stages: Stage[] = [
-    { n: 1, title: 'Inquiry', desc: 'Capture a customer enquiry and the parts to quote.', icon: 'MessageSquare', link: '/inquiries', phase: 'Win the work' },
-    { n: 2, title: 'Quote', desc: 'Estimate cost, set price & margin, send and revise.', icon: 'FileText', link: '/quotes', phase: 'Win the work' },
-    { n: 3, title: 'Sales Order', desc: 'Convert an accepted quote into a confirmed order.', icon: 'ClipboardList', link: '/sales-orders', phase: 'Win the work' },
-    { n: 4, title: 'Engineering', desc: 'Define routing + BOM, then release to plan.', icon: 'Settings', link: '/parts', phase: 'Make it' },
-    { n: 5, title: 'MRP & Work Orders', desc: 'Plan work orders & requisitions from released orders.', icon: 'ClipboardCheck', link: '/work-orders', phase: 'Make it' },
-    { n: 6, title: 'Purchasing', desc: 'RFQ, raise POs, and receive material (GRN).', icon: 'Receipt', link: '/purchase-orders', phase: 'Make it' },
-    { n: 7, title: 'Inventory', desc: 'Track raw & finished goods; clear incoming QC.', icon: 'Warehouse', link: '/stock', phase: 'Make it' },
-    { n: 8, title: 'Production', desc: 'Clock operations and track work-order progress.', icon: 'LayoutGrid', link: '/production-board', phase: 'Make it' },
-    { n: 9, title: 'Quality', desc: 'Inspections and NCRs before shipping.', icon: 'CheckSquare', link: '/inspections', phase: 'Assure & ship' },
-    { n: 10, title: 'Dispatch', desc: 'Pack, dispatch, e-way bill, challan and POD.', icon: 'ArrowUpRight', link: '/shipments', phase: 'Assure & ship' },
-    { n: 11, title: 'Invoice & Payments', desc: 'GST invoices, collect payments, pay vendors.', icon: 'CreditCard', link: '/invoices', phase: 'Get paid & close' },
-    { n: 12, title: 'Closure', desc: 'Acceptance, checklist, profitability, close.', icon: 'CheckCircle', link: '/closure', phase: 'Get paid & close' },
+    { n: 1, title: 'Inquiry', desc: 'Capture a customer enquiry and the parts to quote.', icon: 'MessageSquare', link: '/inquiries', phase: 'Win the work', cls: 'p-win' },
+    { n: 2, title: 'Quote', desc: 'Estimate cost, set price & margin, send and revise.', icon: 'FileText', link: '/quotes', phase: 'Win the work', cls: 'p-win' },
+    { n: 3, title: 'Sales Order', desc: 'Convert an accepted quote into a confirmed order.', icon: 'ClipboardList', link: '/sales-orders', phase: 'Win the work', cls: 'p-win' },
+    { n: 4, title: 'Engineering', desc: 'Define routing + BOM, then release to plan.', icon: 'Settings', link: '/parts', phase: 'Make it', cls: 'p-make' },
+    { n: 5, title: 'MRP & Work Orders', desc: 'Plan work orders & requisitions from released orders.', icon: 'ClipboardCheck', link: '/work-orders', phase: 'Make it', cls: 'p-make' },
+    { n: 6, title: 'Purchasing', desc: 'RFQ, raise POs, and receive material (GRN).', icon: 'Receipt', link: '/purchase-orders', phase: 'Make it', cls: 'p-make' },
+    { n: 7, title: 'Inventory', desc: 'Track raw & finished goods; clear incoming QC.', icon: 'Warehouse', link: '/stock', phase: 'Make it', cls: 'p-make' },
+    { n: 8, title: 'Production', desc: 'Clock operations and track work-order progress.', icon: 'LayoutGrid', link: '/production-board', phase: 'Make it', cls: 'p-make' },
+    { n: 9, title: 'Quality', desc: 'Inspections and NCRs before shipping.', icon: 'CheckSquare', link: '/inspections', phase: 'Assure & ship', cls: 'p-ship' },
+    { n: 10, title: 'Dispatch', desc: 'Pack, dispatch, e-way bill, challan and POD.', icon: 'ArrowUpRight', link: '/shipments', phase: 'Assure & ship', cls: 'p-ship' },
+    { n: 11, title: 'Invoice & Payments', desc: 'GST invoices, collect payments, pay vendors.', icon: 'CreditCard', link: '/invoices', phase: 'Get paid & close', cls: 'p-close' },
+    { n: 12, title: 'Closure', desc: 'Acceptance, checklist, profitability, close.', icon: 'CheckCircle', link: '/closure', phase: 'Get paid & close', cls: 'p-close' },
   ];
 
   @ViewChild('flow') flowRef!: ElementRef<HTMLElement>;
@@ -91,7 +91,7 @@ export class GettingStartedPage implements AfterViewInit, OnDestroy {
     }
     this.conns.set(conns);
     const first = r[0], last = r[r.length - 1];
-    this.startDot.set({ x: Math.max(first.x - 20, 6), y: first.cy });
-    this.endDot.set({ x: Math.min(last.x + last.w + 20, base.width - 6), y: last.cy });
+    this.startDot.set({ x: Math.max(first.x - 18, 5), y: first.cy });
+    this.endDot.set({ x: Math.min(last.x + last.w + 18, base.width - 5), y: last.cy });
   }
 }

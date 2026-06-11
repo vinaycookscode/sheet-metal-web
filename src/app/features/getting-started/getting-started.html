@@ -1,35 +1,41 @@
-<div class="page">
-  <div class="page-header">
-    <div>
-      <h1>Getting Started</h1>
-      <p class="muted">How an order flows through the plant — follow the path, click any stage to jump in.</p>
+<div class="page gs">
+  <div class="gs-head">
+    <div class="gs-kicker">Getting Started</div>
+    <h1 class="gs-title">How an order flows through the plant</h1>
+    <p class="gs-sub">Follow the path from a customer enquiry to a paid, closed job — click any stage to jump in.</p>
+    <div class="gs-legend">
+      <span class="gs-lg p-win"><b></b> Win the work</span>
+      <span class="gs-lg p-make"><b></b> Make it</span>
+      <span class="gs-lg p-ship"><b></b> Assure &amp; ship</span>
+      <span class="gs-lg p-close"><b></b> Get paid &amp; close</span>
     </div>
   </div>
 
   <div class="flow" #flow [style.gridTemplateColumns]="'repeat(' + cols() + ', 1fr)'">
-    <svg class="flow__svg" [attr.width]="svgW()" [attr.height]="svgH()" [attr.viewBox]="'0 0 ' + svgW() + ' ' + svgH()">
+    <svg class="flow__svg" [attr.width]="svgW()" [attr.height]="svgH()" [attr.viewBox]="'0 0 ' + svgW() + ' ' + svgH()" preserveAspectRatio="none">
       <defs>
-        <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#ec4899" />
-          <stop offset="1" stop-color="#a855f7" />
+        <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#6366f1" />
+          <stop offset="0.5" stop-color="#a855f7" />
+          <stop offset="1" stop-color="#ec4899" />
         </linearGradient>
-        <marker id="flowArrow" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto">
-          <path d="M0,0 L9,4.5 L0,9 Z" fill="#ec4899" />
+        <marker id="flowArrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 Z" fill="#ec4899" />
         </marker>
       </defs>
       @for (c of conns(); track $index) {
         <line class="flow__conn" [attr.x1]="c.x1" [attr.y1]="c.y1" [attr.x2]="c.x2" [attr.y2]="c.y2" marker-end="url(#flowArrow)" />
       }
-      @if (startDot(); as d) { <circle class="flow__dot" [attr.cx]="d.x" [attr.cy]="d.y" r="8" /> }
-      @if (endDot(); as d) { <circle class="flow__dot" [attr.cx]="d.x" [attr.cy]="d.y" r="8" /> }
+      @if (startDot(); as d) { <circle class="flow__dot" [attr.cx]="d.x" [attr.cy]="d.y" r="7" /> }
+      @if (endDot(); as d) { <circle class="flow__dot" [attr.cx]="d.x" [attr.cy]="d.y" r="7" /> }
     </svg>
 
     @for (s of stages; track s.n; let i = $index) {
-      <a #node class="flow__node" [routerLink]="s.link" [style.gridColumn]="gridCol(i)" [style.gridRow]="gridRow(i)">
+      <a #node class="flow__node" [class]="'flow__node ' + s.cls" [routerLink]="s.link" [style.gridColumn]="gridCol(i)" [style.gridRow]="gridRow(i)">
         <span class="flow__phase">{{ s.phase }}</span>
         <div class="flow__top">
+          <span class="flow__badge"><lucide-icon [name]="s.icon" [size]="22" /></span>
           <span class="flow__num">{{ s.n }}</span>
-          <lucide-icon [name]="s.icon" [size]="20" class="flow__icon" />
         </div>
         <div class="flow__title">{{ s.title }}</div>
         <div class="flow__desc">{{ s.desc }}</div>
