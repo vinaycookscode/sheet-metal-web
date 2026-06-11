@@ -1,36 +1,39 @@
-<div class="page gs">
+<div class="page">
   <div class="page-header">
     <div>
       <h1>Getting Started</h1>
-      <p class="muted">How an order flows through the plant — click any stage to jump in.</p>
+      <p class="muted">How an order flows through the plant — follow the path, click any stage to jump in.</p>
     </div>
   </div>
 
-  @for (phase of phases; track phase.label; let last = $last) {
-    <div class="gs-phase">
-      <div class="gs-phase__head">
-        <span class="gs-phase__label">{{ phase.label }}</span>
-        <span class="muted">{{ phase.hint }}</span>
-      </div>
-      <div class="gs-grid">
-        @for (s of phase.stages; track s.n) {
-          <a [routerLink]="s.link" class="gs-card">
-            <gw-card padding="lg">
-              <div class="gs-card__top">
-                <span class="gs-card__num">{{ s.n }}</span>
-                <lucide-icon [name]="s.icon" [size]="20" class="gs-card__icon" />
-              </div>
-              <div class="gs-card__title">{{ s.title }}</div>
-              <div class="gs-card__desc">{{ s.desc }}</div>
-            </gw-card>
-          </a>
-        }
-      </div>
-    </div>
-    @if (!last) { <div class="gs-arrow" aria-hidden="true">↓</div> }
-  }
+  <div class="flow" #flow [style.gridTemplateColumns]="'repeat(' + cols() + ', 1fr)'">
+    <svg class="flow__svg" [attr.width]="svgW()" [attr.height]="svgH()" [attr.viewBox]="'0 0 ' + svgW() + ' ' + svgH()">
+      <defs>
+        <linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#ec4899" />
+          <stop offset="1" stop-color="#a855f7" />
+        </linearGradient>
+        <marker id="flowArrow" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#ec4899" />
+        </marker>
+      </defs>
+      @for (c of conns(); track $index) {
+        <line class="flow__conn" [attr.x1]="c.x1" [attr.y1]="c.y1" [attr.x2]="c.x2" [attr.y2]="c.y2" marker-end="url(#flowArrow)" />
+      }
+      @if (startDot(); as d) { <circle class="flow__dot" [attr.cx]="d.x" [attr.cy]="d.y" r="8" /> }
+      @if (endDot(); as d) { <circle class="flow__dot" [attr.cx]="d.x" [attr.cy]="d.y" r="8" /> }
+    </svg>
 
-  <gw-card padding="lg" class="gs-foot">
-    <p class="muted">New here? Work top to bottom: start by creating an <a routerLink="/inquiries">Inquiry</a>, or watch how stages connect — each record shows a progress bar and a “Next step” hint.</p>
-  </gw-card>
+    @for (s of stages; track s.n; let i = $index) {
+      <a #node class="flow__node" [routerLink]="s.link" [style.gridColumn]="gridCol(i)" [style.gridRow]="gridRow(i)">
+        <span class="flow__phase">{{ s.phase }}</span>
+        <div class="flow__top">
+          <span class="flow__num">{{ s.n }}</span>
+          <lucide-icon [name]="s.icon" [size]="20" class="flow__icon" />
+        </div>
+        <div class="flow__title">{{ s.title }}</div>
+        <div class="flow__desc">{{ s.desc }}</div>
+      </a>
+    }
+  </div>
 </div>
