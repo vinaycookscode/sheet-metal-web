@@ -2,13 +2,55 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: var(--surface-page);
   padding: 24px;
+  position: relative;
+  overflow: hidden;
+  // branded sheet-metal background (fixed, independent of theme)
+  background: #10182c;
 }
+
+// gradient sheen — soft brand glows in opposite corners
+.login__sheen {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 520px at 80% -12%, rgba(99, 102, 241, 0.32), transparent 60%),
+    radial-gradient(720px 520px at 0% 105%, rgba(236, 72, 153, 0.20), transparent 60%);
+}
+
+// perforated metal — dot grid fading across the panel
+.login__perf {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: radial-gradient(rgba(148, 163, 255, 0.18) 2px, transparent 2.5px);
+  background-size: 26px 26px;
+  -webkit-mask-image: linear-gradient(160deg, #000, transparent 75%);
+  mask-image: linear-gradient(160deg, #000, transparent 75%);
+}
+
+// thin brand accent bars top & bottom
+.login__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+}
+.login__bar--top { top: 0; }
+.login__bar--bottom { bottom: 0; }
 
 .login__card {
   width: 100%;
   max-width: 380px;
+  position: relative;
+  z-index: 2;
 }
 
 .login__brand {
