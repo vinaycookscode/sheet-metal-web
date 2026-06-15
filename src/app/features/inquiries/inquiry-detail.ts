@@ -38,6 +38,7 @@ export class InquiryDetailPage implements OnInit {
   readonly error = signal('');
   readonly editing = signal(false);
 
+  readonly today = new Date().toISOString().slice(0, 10);
   readonly editForm = this.fb.nonNullable.group({ requiredDate: [''], notes: [''] });
 
   readonly columns: GwTableColumn[] = [

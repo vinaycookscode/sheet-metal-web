@@ -17,6 +17,8 @@ import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component
 import { AuditPanelComponent } from '../../shared/audit-panel/audit-panel';
 import { DocumentsPanelComponent } from '../../shared/documents-panel/documents-panel';
 import { LifecycleStepperComponent } from '../../shared/lifecycle-stepper/lifecycle-stepper';
+import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
+import { SoPrintPage } from './so-print';
 
 const NEXT: Record<string, string[]> = {
   confirmed: ['in_production', 'cancelled'],
@@ -32,7 +34,7 @@ const humanize = (s: string): string => s.replace(/_/g, ' ').replace(/\b\w/g, (c
 @Component({
   selector: 'app-so-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwAlertComponent, AuditPanelComponent, DocumentsPanelComponent, LifecycleStepperComponent],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwSelectComponent, GwAlertComponent, AuditPanelComponent, DocumentsPanelComponent, LifecycleStepperComponent, GwDrawerComponent, SoPrintPage],
   templateUrl: './so-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -51,6 +53,8 @@ export class SoDetailPage implements OnInit {
   readonly parts = signal<GwSelectOption[]>([]);
   readonly planningLineId = signal<string | null>(null);
   readonly partControl = this.fb.control('', { nonNullable: true });
+  readonly showDoc = signal(false);
+  printDoc(): void { window.print(); }
   readonly editing = signal(false);
   @ViewChild(AuditPanelComponent) private auditPanel?: AuditPanelComponent;
   readonly taxCodes = signal<GwSelectOption[]>([]);

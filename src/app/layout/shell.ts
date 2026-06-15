@@ -103,6 +103,7 @@ export class ShellComponent {
   private flashTimer?: ReturnType<typeof setTimeout>;
   constructor() {
     this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)).subscribe((e) => {
+      this.mobileNavOpen.set(false); // close the mobile drawer after navigating
       if (e.urlAfterRedirects.includes('flash=1')) {
         this.flash.set(true);
         if (this.flashTimer) clearTimeout(this.flashTimer);
@@ -110,6 +111,11 @@ export class ShellComponent {
       }
     });
   }
+
+  /** Mobile slide-in nav drawer. */
+  readonly mobileNavOpen = signal(false);
+  toggleNav(): void { this.mobileNavOpen.update((v) => !v); }
+  closeNav(): void { this.mobileNavOpen.set(false); }
 
   /** First-login welcome (onboarding) — shown once, then remembered. */
   readonly showWelcome = signal(typeof localStorage !== 'undefined' && !localStorage.getItem('sm_welcomed'));

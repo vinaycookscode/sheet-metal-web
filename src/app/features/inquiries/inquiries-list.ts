@@ -38,6 +38,7 @@ export class InquiriesListPage implements OnInit {
   readonly saving = signal(false);
   readonly error = signal('');
   readonly customerOptions = signal<GwSelectOption[]>([]);
+  readonly today = new Date().toISOString().slice(0, 10);
 
   readonly columns: GwTableColumn[] = [
     { key: 'number', label: 'Inquiry #', width: '160px' },

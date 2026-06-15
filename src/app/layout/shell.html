@@ -1,6 +1,7 @@
 <div class="app-shell">
   <gw-top-nav class="app-topbar" [sticky]="true">
     <div gw-top-nav-brand class="sm-brand">
+      <gw-icon-button class="sm-burger" icon="Menu" ariaLabel="Open menu" variant="ghost" (click)="toggleNav()" />
       <img src="logo.svg" alt="" class="sm-brand__logo" width="30" height="30" />
       <span class="sm-brand__name">Sheet Metal ERP</span>
     </div>
@@ -9,11 +10,13 @@
       <app-notification-bell />
       <gw-icon-button [icon]="theme() === 'dark' ? 'Sun' : 'Moon'" [ariaLabel]="theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'" variant="ghost" (click)="toggleTheme()" />
       <span class="sm-topbar-user">{{ user()?.fullName }}</span>
-      <gw-button variant="ghost" size="sm" leadingIcon="LogOut" (click)="logout()">Logout</gw-button>
+      <gw-button class="sm-logout" variant="ghost" size="sm" leadingIcon="LogOut" (click)="logout()">Logout</gw-button>
     </div>
   </gw-top-nav>
 
-  <gw-sidebar class="app-sidebar" [sections]="sections" [activeKey]="activeKey()">
+  <div class="app-nav-backdrop" [class.is-open]="mobileNavOpen()" (click)="closeNav()"></div>
+
+  <gw-sidebar class="app-sidebar" [class.is-open]="mobileNavOpen()" [sections]="sections" [activeKey]="activeKey()">
     <div gw-sidebar-brand class="sm-sb-brand">Pune Plant · PLANT1</div>
   </gw-sidebar>
 

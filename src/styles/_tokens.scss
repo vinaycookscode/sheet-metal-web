@@ -95,6 +95,11 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --surface-overlay:  rgba(28, 25, 23, 0.42);
   --bg-card:          var(--surface-card);
   --bg-page:          #{$surface-page};
+
+  // Branded app backdrop (perforated sheet-metal) — light
+  --app-dot:      rgba(99, 102, 241, 0.10);
+  --app-sheen-a:  rgba(99, 102, 241, 0.07);
+  --app-sheen-b:  rgba(236, 72, 153, 0.05);
   --bg-hover:         rgba(28, 25, 23, 0.04);
   --bg-input:         #ffffff;
 
@@ -194,6 +199,11 @@ $ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
   --bg-card:         var(--surface-card);
   --bg-page:         var(--surface-page);
   --bg-hover:        rgba(255, 255, 255, 0.06);
+
+  // Branded app backdrop (perforated sheet-metal) — dark
+  --app-dot:      rgba(168, 163, 255, 0.09);
+  --app-sheen-a:  rgba(129, 140, 248, 0.14);
+  --app-sheen-b:  rgba(236, 72, 153, 0.10);
   --bg-input:        #242120;
 
   // Text

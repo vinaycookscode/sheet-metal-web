@@ -15,7 +15,7 @@
             <gw-select formControlName="customerId" [options]="customerOptions()" placeholder="Select customer" />
           </gw-form-field>
           <gw-form-field label="Required date">
-            <gw-date-input formControlName="requiredDate" />
+            <gw-date-input formControlName="requiredDate" [min]="today" />
           </gw-form-field>
           <gw-form-field label="Notes" class="field--full">
             <gw-input formControlName="notes" placeholder="Optional notes" />

@@ -11,6 +11,8 @@
 @use 'app/shared/ui/feedback/toast/toast.styles';     // body-appended toast stack
 
 // ── Layout scaffold ──
+html, body { overflow-x: hidden; }   // never allow horizontal page scroll
+
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
@@ -19,6 +21,28 @@
   background: var(--surface-page);
   position: relative;
   z-index: 1;
+
+  // Branded backdrop — dual brand sheen + perforated dot grid (theme-aware).
+  // Fixed behind the grid; reads clearly in content, softly under the glass panels.
+  &::before,
+  &::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  &::before {
+    background:
+      radial-gradient(820px 440px at 88% -6%, var(--app-sheen-a), transparent 60%),
+      radial-gradient(720px 480px at -4% 104%, var(--app-sheen-b), transparent 60%);
+  }
+  &::after {
+    background-image: radial-gradient(var(--app-dot) 1.5px, transparent 1.6px);
+    background-size: 24px 24px;
+    -webkit-mask-image: linear-gradient(165deg, #000, transparent 80%);
+    mask-image: linear-gradient(165deg, #000, transparent 80%);
+  }
 
   .app-topbar {
     grid-column: 1 / -1;
@@ -52,6 +76,8 @@
     grid-row: 2;
     overflow-y: auto;
     min-height: 0;
+    position: relative;
+    z-index: 1; // sit above the branded backdrop
   }
 
   // ── Tablet: collapse sidebar to icons only ──
@@ -63,41 +89,78 @@
     }
   }
 
-  // ── Mobile: stack topbar + content, hide sidebar ──
+  // ── Mobile: single column; sidebar becomes a slide-in drawer ──
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    grid-template-rows: var(--topbar-height) 1fr auto;
+    grid-template-rows: var(--topbar-height) 1fr;
 
     .app-topbar { grid-column: 1; }
-
-    .app-sidebar {
-      grid-column: 1;
-      grid-row: 3;
-      height: auto;
-      position: sticky;
-      bottom: 0;
-      top: auto;
-      border-right: none;
-      border-top: 1px solid var(--border);
-      z-index: var(--z-topbar);
-    }
 
     .app-content {
       grid-column: 1;
       grid-row: 2;
     }
+
+    .app-sidebar {
+      position: fixed;
+      top: var(--topbar-height);
+      left: 0;
+      bottom: 0;
+      width: min(82vw, 290px);
+      height: auto;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform 0.26s ease;
+      border-right: 1px solid var(--border);
+      border-top: none;
+      box-shadow: 8px 0 32px rgba(0, 0, 0, 0.28);
+      z-index: 450; // above content + backdrop, below the topbar (500)
+
+      &.is-open { transform: translateX(0); }
+    }
+  }
+}
+
+// Mobile nav hamburger — only shown on mobile
+.sm-burger { display: none; }
+
+// Backdrop behind the mobile nav drawer
+.app-nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 440;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.26s ease;
+}
+@media (max-width: 768px) {
+  .sm-burger { display: inline-flex; margin-right: 2px; }
+  .app-nav-backdrop {
+    display: block;
+    &.is-open { opacity: 1; pointer-events: auto; }
   }
 }
 
 // ── Responsive page padding ──
 @media (max-width: 768px) {
-  .page { padding: 16px; }
-  .page-header { gap: 12px; }
+  .page { padding: 14px 8px; }   // near full-width content, small side gutters
+  .page-header { gap: 10px; flex-wrap: wrap; margin-bottom: 14px; padding: 0 2px; }
+  .gw-stat { padding: 13px 14px; }                 // compact KPI cards on phones
+  .gw-stat .gw-stat__value { font-size: 24px; }
   .inv-summary { grid-template-columns: 1fr !important; }
   .branch-grid { grid-template-columns: 1fr !important; }
   .form-grid   { grid-template-columns: 1fr !important; }
   .field--full { grid-column: auto !important; }
   .tab-bar     { overflow-x: auto; }
+  .aging       { grid-template-columns: repeat(2, 1fr) !important; } // AR/AP aging buckets
+  .si-row      { flex-wrap: wrap; }                                  // supplier-invoice action rows
+  // de-clutter the top bar on phones (the right cluster doesn't shrink, so trim it)
+  .sm-topbar-user { display: none; }
+  .sm-topbar-right { gap: 4px; }
+  .sm-brand__name { display: none; }
+  .sm-logout .gw-button__label { display: none; }   // logout becomes icon-only
 }
 
 @media (max-width: 1024px) {
@@ -209,6 +272,7 @@ h1, h2, h3 { letter-spacing: -0.012em; }
 // ── Print: isolate the document drawer (.print-doc) onto a clean A4 page ──
 @media print {
   .app-shell { display: block !important; }
+  .app-shell::before, .app-shell::after { display: none !important; } // hide branded backdrop in print
   .app-topbar, .app-sidebar { display: none !important; }
   .app-content { display: block !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; }
   .page { display: none !important; }                 // hide the detail page behind the drawer

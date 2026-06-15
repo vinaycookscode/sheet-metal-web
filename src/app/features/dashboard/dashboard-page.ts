@@ -23,6 +23,10 @@ interface Kpi { label: string; value: number; icon: string; }
     .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
     .chart-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:24px}
     .chart-title{font-size:14px;font-weight:600;margin:0 0 16px;color:var(--text-primary,#111)}
+    @media (max-width:768px){
+      .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+      .chart-grid{grid-template-columns:1fr;gap:12px;margin-bottom:16px}
+    }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

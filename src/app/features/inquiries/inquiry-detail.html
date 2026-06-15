@@ -29,7 +29,7 @@
     <gw-card padding="lg" class="mb-4">
       @if (editing()) {
         <div class="form-grid" [formGroup]="editForm">
-          <gw-form-field label="Required date"><gw-date-input formControlName="requiredDate" /></gw-form-field>
+          <gw-form-field label="Required date"><gw-date-input formControlName="requiredDate" [min]="today" /></gw-form-field>
           <gw-form-field label="Notes"><gw-input formControlName="notes" placeholder="Optional notes" /></gw-form-field>
         </div>
         <div class="form-actions mt-3">
