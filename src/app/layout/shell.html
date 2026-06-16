@@ -16,11 +16,12 @@
 
   <div class="app-nav-backdrop" [class.is-open]="mobileNavOpen()" (click)="closeNav()"></div>
 
-  <gw-sidebar class="app-sidebar" [class.is-open]="mobileNavOpen()" [sections]="sections" [activeKey]="activeKey()">
+  <gw-sidebar class="app-sidebar" [class.is-open]="mobileNavOpen()" [sections]="sections()" [activeKey]="activeKey()">
     <div gw-sidebar-brand class="sm-sb-brand">Pune Plant · PLANT1</div>
   </gw-sidebar>
 
   <main class="app-content" [class.is-flash]="flash()">
+    <app-blocker-banner />
     <router-outlet />
   </main>
 </div>

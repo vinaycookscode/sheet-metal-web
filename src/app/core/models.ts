@@ -4,7 +4,21 @@ export interface AuthUser {
   id: string;
   fullName: string;
   orgId: string;
+  roles: string[];
   permissions: string[];
+}
+
+/** A "here's how to fix it" hint attached to a blocker (mirrors the API BlockedException). */
+export interface BlockerAction {
+  label: string;
+  link?: string;
+}
+
+/** Structured business-rule blocker surfaced by the API's global exception filter. */
+export interface ApiBlocker {
+  code: string;
+  message: string;
+  action?: BlockerAction;
 }
 
 export interface LoginRequest {
