@@ -21,6 +21,24 @@ export interface ApiBlocker {
   action?: BlockerAction;
 }
 
+export type TaskPriority = 'high' | 'normal' | 'low';
+
+/** One actionable card in the Task Inbox (mirrors the API tasks feed). */
+export interface TaskItem {
+  id: string;
+  kind: string;
+  title: string;
+  subtitle: string;
+  link: string;
+  actionLabel: string;
+  priority: TaskPriority;
+}
+
+export interface TaskInbox {
+  items: TaskItem[];
+  total: number;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

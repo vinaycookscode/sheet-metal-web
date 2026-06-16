@@ -55,6 +55,7 @@ export class ShellComponent {
   private readonly navModel: NavSection[] = [
     {
       items: [
+        { key: 'inbox', label: 'My Tasks', icon: 'Inbox', link: '/inbox' },
         { key: 'getting-started', label: 'Getting Started', icon: 'Compass', link: '/getting-started' },
         { key: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', link: '/dashboard' },
         { key: 'kpis', label: 'Management KPIs', icon: 'TrendingUp', link: '/kpis', adminOnly: true },

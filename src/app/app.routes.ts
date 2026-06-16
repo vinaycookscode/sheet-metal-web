@@ -1,5 +1,7 @@
+import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
+import { AuthService } from './core/auth.service';
 
 export const routes: Routes = [
   {
@@ -11,7 +13,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./layout/shell').then((m) => m.ShellComponent),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      // Persona-aware landing: admins get the data dashboard, everyone else gets
+      // their Task Inbox ("what needs me now") rather than a module menu.
+      { path: '', pathMatch: 'full', redirectTo: () => (inject(AuthService).isAdmin() ? '/dashboard' : '/inbox') },
+      { path: 'inbox', loadComponent: () => import('./features/home/task-inbox').then((m) => m.TaskInboxPage) },
       { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard-page').then((m) => m.DashboardPage) },
       { path: 'getting-started', loadComponent: () => import('./features/getting-started/getting-started').then((m) => m.GettingStartedPage) },
       { path: 'kpis', loadComponent: () => import('./features/analytics/kpi-dashboard').then((m) => m.KpiDashboardPage) },

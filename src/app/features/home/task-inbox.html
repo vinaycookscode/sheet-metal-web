@@ -1,0 +1,51 @@
+<div class="page inbox">
+  <header class="inbox__head">
+    <h1>Good day, {{ firstName() }}</h1>
+    <p class="muted">Here's what needs you right now.</p>
+  </header>
+
+  @if (loading()) {
+    <p class="muted">Loading your tasks…</p>
+  } @else if (items().length === 0) {
+    <gw-card elevation="sm" padding="lg">
+      <div class="inbox__empty">
+        <h2>You're all caught up 🎉</h2>
+        <p class="muted">No actions are waiting on you. New inquiries and quotes will show up here.</p>
+      </div>
+    </gw-card>
+  } @else {
+    @if (highItems().length) {
+      <h2 class="inbox__section">Needs you now</h2>
+      <div class="inbox__list">
+        @for (t of highItems(); track t.id + t.kind) {
+          <gw-card class="inbox__item inbox__item--high" elevation="sm" padding="md">
+            <div class="inbox__row">
+              <div class="inbox__text">
+                <p class="inbox__title">{{ t.title }}</p>
+                <p class="inbox__sub muted">{{ t.subtitle }}</p>
+              </div>
+              <gw-button size="sm" variant="primary" [routerLink]="t.link">{{ t.actionLabel }}</gw-button>
+            </div>
+          </gw-card>
+        }
+      </div>
+    }
+
+    @if (laterItems().length) {
+      <h2 class="inbox__section">Coming up</h2>
+      <div class="inbox__list">
+        @for (t of laterItems(); track t.id + t.kind) {
+          <gw-card class="inbox__item" elevation="sm" padding="md">
+            <div class="inbox__row">
+              <div class="inbox__text">
+                <p class="inbox__title">{{ t.title }}</p>
+                <p class="inbox__sub muted">{{ t.subtitle }}</p>
+              </div>
+              <gw-button size="sm" variant="ghost" [routerLink]="t.link">{{ t.actionLabel }}</gw-button>
+            </div>
+          </gw-card>
+        }
+      </div>
+    }
+  }
+</div>
