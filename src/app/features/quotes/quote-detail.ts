@@ -9,11 +9,13 @@ import { GwButtonComponent } from '../../shared/ui/buttons/button/button.compone
 import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
 import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/table.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
+import { NextActionBarComponent } from '../../shared/next-action-bar/next-action-bar';
+import { JOURNEY_STAGES } from '../../shared/next-action-bar/journey';
 
 @Component({
   selector: 'app-quote-detail',
   standalone: true,
-  imports: [RouterLink, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwAlertComponent],
+  imports: [RouterLink, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwAlertComponent, NextActionBarComponent],
   templateUrl: './quote-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -30,6 +32,21 @@ export class QuoteDetailPage implements OnInit {
   readonly error = signal('');
 
   readonly current = computed<QuoteVersion | null>(() => this.quote()?.versions?.find((v) => v.isCurrent) ?? null);
+
+  readonly journeyStages = JOURNEY_STAGES;
+  /** True while the quote still has a forward action (draft/sent/accepted). */
+  readonly hasActions = computed(() => ['draft', 'sent', 'accepted'].includes(this.quote()?.status ?? ''));
+  /** Plain-language "what to do next" for the guided bar, by quote status. */
+  readonly hint = computed(() => {
+    switch (this.quote()?.status) {
+      case 'draft': return 'Send the quote to the customer.';
+      case 'sent': return "Awaiting the customer's decision — accept it, then create the sales order.";
+      case 'accepted': return 'Accepted — create the sales order.';
+      case 'rejected': return 'Rejected — no further action.';
+      case 'expired': return 'Expired — revise it to re-quote.';
+      default: return undefined;
+    }
+  });
 
   readonly columns: GwTableColumn[] = [
     { key: 'lineNo', label: '#', width: '60px' },

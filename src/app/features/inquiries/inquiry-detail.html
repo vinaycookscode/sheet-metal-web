@@ -13,18 +13,19 @@
         @if (canChange(inq.status) && !editing()) {
           <gw-button variant="ghost" leadingIcon="Pencil" [disabled]="busy()" (click)="startEdit()">Edit</gw-button>
         }
-        @if (inq.status === 'new') {
-          <gw-button variant="secondary" leadingIcon="ArrowRight" [loading]="busy()" (click)="send()">Send to estimation</gw-button>
-        }
-        @if (canChange(inq.status)) {
-          <gw-button variant="primary" leadingIcon="FileText" [loading]="busy()" (click)="createQuote()">Create quote</gw-button>
-          <gw-button variant="ghost" [disabled]="busy()" (click)="won()">Mark won</gw-button>
-          <gw-button variant="ghost" [disabled]="busy()" (click)="lost()">Mark lost</gw-button>
-        }
       </div>
     </div>
 
     @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
+
+    <app-next-action-bar [stages]="journeyStages" [current]="0" [hint]="hint()" [hasActions]="canChange(inq.status)">
+      <gw-button primary-action variant="primary" leadingIcon="FileText" [loading]="busy()" (click)="createQuote()">Create quote</gw-button>
+      @if (inq.status === 'new') {
+        <gw-button secondary-actions variant="ghost" leadingIcon="ArrowRight" [loading]="busy()" (click)="send()">Send to estimation</gw-button>
+      }
+      <gw-button secondary-actions variant="ghost" [disabled]="busy()" (click)="won()">Mark won</gw-button>
+      <gw-button secondary-actions variant="ghost" [disabled]="busy()" (click)="lost()">Mark lost</gw-button>
+    </app-next-action-bar>
 
     <gw-card padding="lg" class="mb-4">
       @if (editing()) {

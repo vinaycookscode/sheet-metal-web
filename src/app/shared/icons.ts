@@ -46,7 +46,7 @@ import {
   // Patient Journey
   Route,
   // Sheet-metal additions
-  Layers,
+  Layers, Send,
 } from 'lucide-angular';
 
 @NgModule({
@@ -84,7 +84,7 @@ import {
   Download, Image, CloudUpload, FileIcon,
   // Patient Journey
   Route,
-  Layers,
+  Layers, Send,
     }),
   ],
   exports: [LucideAngularModule],

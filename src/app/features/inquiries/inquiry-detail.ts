@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { InquiriesService } from '../../core/inquiries.service';
@@ -15,11 +15,13 @@ import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
 import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
 import { DocumentsPanelComponent } from '../../shared/documents-panel/documents-panel';
+import { NextActionBarComponent } from '../../shared/next-action-bar/next-action-bar';
+import { JOURNEY_STAGES } from '../../shared/next-action-bar/journey';
 
 @Component({
   selector: 'app-inquiry-detail',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwDateInputComponent, GwAlertComponent, DocumentsPanelComponent],
+  imports: [RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent, GwFormFieldComponent, GwInputComponent, GwDateInputComponent, GwAlertComponent, DocumentsPanelComponent, NextActionBarComponent],
   templateUrl: './inquiry-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -40,6 +42,20 @@ export class InquiryDetailPage implements OnInit {
 
   readonly today = new Date().toISOString().slice(0, 10);
   readonly editForm = this.fb.nonNullable.group({ requiredDate: [''], notes: [''] });
+
+  readonly journeyStages = JOURNEY_STAGES;
+  /** Plain-language "what to do next" for the guided bar, by inquiry status. */
+  readonly hint = computed(() => {
+    switch (this.inquiry()?.status) {
+      case 'new': return 'Send to estimation, then turn it into a quote.';
+      case 'estimating': return 'Create the quote from this inquiry.';
+      case 'quoted': return 'Quote created — open Quotes to send it to the customer.';
+      case 'won': return 'Won — this inquiry became a sales order.';
+      case 'lost': return 'Marked lost — no further action.';
+      case 'cancelled': return 'Cancelled.';
+      default: return undefined;
+    }
+  });
 
   readonly columns: GwTableColumn[] = [
     { key: 'lineNo', label: '#', width: '60px' },
