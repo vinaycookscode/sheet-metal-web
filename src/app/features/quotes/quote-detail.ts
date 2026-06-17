@@ -34,11 +34,13 @@ export class QuoteDetailPage implements OnInit {
   readonly current = computed<QuoteVersion | null>(() => this.quote()?.versions?.find((v) => v.isCurrent) ?? null);
 
   readonly journeyStages = JOURNEY_STAGES;
-  /** True while the quote still has a forward action (draft/sent/accepted). */
-  readonly hasActions = computed(() => ['draft', 'sent', 'accepted'].includes(this.quote()?.status ?? ''));
-  /** Plain-language "what to do next" for the guided bar, by quote status. */
+  /** A forward action is available (open the order, or a draft/sent/accepted step). */
+  readonly hasActions = computed(() => !!this.quote()?.salesOrder || ['draft', 'sent', 'accepted'].includes(this.quote()?.status ?? ''));
+  /** Plain-language "what to do next" for the guided bar. */
   readonly hint = computed(() => {
-    switch (this.quote()?.status) {
+    const q = this.quote();
+    if (q?.salesOrder) return `Converted to sales order ${q.salesOrder.number} — open it to continue.`;
+    switch (q?.status) {
       case 'draft': return 'Send the quote to the customer.';
       case 'sent': return "Awaiting the customer's decision — accept it, then create the sales order.";
       case 'accepted': return 'Accepted — create the sales order.';

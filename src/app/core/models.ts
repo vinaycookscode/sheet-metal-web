@@ -142,6 +142,8 @@ export interface QuoteVersion {
 export interface Quote {
   id: string; number: string; customerId: string; projectId?: string; inquiryId?: string;
   currentVersion: number; status: string; winLossReason?: string; versions?: QuoteVersion[]; createdAt: string;
+  /** Present once this quote has been converted — link to the order instead of re-creating. */
+  salesOrder?: { id: string; number: string };
 }
 
 export interface SoLine {

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { SalesOrdersService } from '../../core/sales-orders.service';
 import { EngineeringService } from '../../core/engineering.service';
 import { MetaService } from '../../core/meta.service';
@@ -88,7 +88,14 @@ export class SoDetailPage implements OnInit {
   ];
 
   ngOnInit(): void {
-    forkJoin({ order: this.svc.get(this.id), parts: this.eng.list(), taxCodes: this.meta.taxCodes() }).subscribe({
+    // The order is the only essential call. Parts/tax-codes power the (operations-only)
+    // line-planning + edit controls; a sales user can't read them (403) — tolerate that
+    // instead of failing the whole page with a misleading "not found".
+    forkJoin({
+      order: this.svc.get(this.id),
+      parts: this.eng.list().pipe(catchError(() => of([]))),
+      taxCodes: this.meta.taxCodes().pipe(catchError(() => of([]))),
+    }).subscribe({
       next: ({ order, parts, taxCodes }) => {
         this.order.set(order);
         this.parts.set(parts.map((p) => ({ value: p.id, label: `${p.partNo}-${p.rev}${p.isReleased ? '' : ' (draft)'}` })));
