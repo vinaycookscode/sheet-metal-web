@@ -57,6 +57,41 @@
       </gw-card>
     }
 
+    <!-- Version history (price/terms evolution across revisions) -->
+    @if (versions().length > 1) {
+      <p class="muted mb-2 mt-4">Version history</p>
+      <gw-card padding="lg">
+        <div class="ver-list">
+          @for (v of versions(); track v.id) {
+            <div class="ver">
+              <div class="ver-head" (click)="toggleVersion(v.versionNo)">
+                <strong>v{{ v.versionNo }}</strong>
+                @if (v.isCurrent) { <gw-badge variant="success">current</gw-badge> }
+                <span class="muted">{{ (v.lines ?? []).length }} lines@if (v.validUntil) { · valid {{ v.validUntil | date:'dd MMM yyyy' }}}</span>
+                <span class="ver-total">₹ {{ v.grandTotal | number:'1.2-2' }}</span>
+                <span class="muted">{{ isVersionOpen(v.versionNo) ? '▲' : '▼' }}</span>
+              </div>
+              @if (isVersionOpen(v.versionNo)) {
+                <table class="ver-lines">
+                  <thead><tr><th>#</th><th>Part</th><th class="r">Qty</th><th class="r">Unit ₹</th></tr></thead>
+                  <tbody>
+                    @for (l of v.lines ?? []; track l.id) {
+                      <tr>
+                        <td>{{ l.lineNo }}</td>
+                        <td>{{ l.partName }}</td>
+                        <td class="r">{{ l.primaryQty }}</td>
+                        <td class="r">{{ l.unitPrice | number:'1.2-2' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              }
+            </div>
+          }
+        </div>
+      </gw-card>
+    }
+
     <!-- Negotiation timeline -->
     @if (timeline().length) {
       <p class="muted mb-2 mt-4">Customer response history</p>

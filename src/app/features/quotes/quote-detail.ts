@@ -40,6 +40,17 @@ import { QuotePrintPage } from './quote-print';
     .rev-lines { width:100%; border-collapse:collapse; }
     .rev-lines th { text-align:left; font-size:.8rem; color:var(--text-secondary,#666); padding:4px 8px; }
     .rev-lines td { padding:4px 8px; border-top:1px solid var(--border,#e5e7eb); vertical-align:middle; }
+    .ver-list { display:flex; flex-direction:column; }
+    .ver { border-top:1px solid var(--border,#e5e7eb); }
+    .ver:first-child { border-top:none; }
+    .ver-head { display:flex; align-items:center; gap:.6rem; padding:.6rem 0; cursor:pointer; }
+    .ver-total { margin-left:auto; font-weight:600; }
+    .ver-delta { font-size:.8rem; }
+    .ver-delta--up { color:var(--color-danger,#dc2626); }
+    .ver-delta--down { color:var(--color-success,#16a34a); }
+    .ver-lines { width:100%; border-collapse:collapse; margin:0 0 .6rem; font-size:.85rem; }
+    .ver-lines th, .ver-lines td { padding:4px 8px; text-align:left; }
+    .ver-lines th.r, .ver-lines td.r { text-align:right; }
   `],
 })
 export class QuoteDetailPage implements OnInit {
@@ -137,6 +148,16 @@ export class QuoteDetailPage implements OnInit {
   }
 
   readonly current = computed<QuoteVersion | null>(() => this.quote()?.versions?.find((v) => v.isCurrent) ?? null);
+
+  /** All versions, newest first — the quote's price/terms history across revisions. */
+  readonly versions = computed<QuoteVersion[]>(() => [...(this.quote()?.versions ?? [])].sort((a, b) => b.versionNo - a.versionNo));
+  readonly expandedVersions = signal<ReadonlySet<number>>(new Set());
+  toggleVersion(n: number): void {
+    const s = new Set(this.expandedVersions());
+    s.has(n) ? s.delete(n) : s.add(n);
+    this.expandedVersions.set(s);
+  }
+  isVersionOpen(n: number): boolean { return this.expandedVersions().has(n); }
 
   readonly journeyStages = JOURNEY_STAGES;
   /** A forward action is available (open the order, or a draft/sent/accepted/negotiating step). */
