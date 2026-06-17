@@ -44,7 +44,7 @@ export class CustomersPage implements OnInit {
   ];
 
   readonly form = this.fb.nonNullable.group({
-    code: ['', Validators.required],
+    code: [''],
     name: ['', Validators.required],
     gstin: [''],
     stateCode: [''],
@@ -76,7 +76,8 @@ export class CustomersPage implements OnInit {
     if (this.form.invalid || this.saving()) return;
     this.saving.set(true);
     this.error.set('');
-    this.svc.create(this.form.getRawValue()).subscribe({
+    const v = this.form.getRawValue();
+    this.svc.create({ ...v, code: v.code || undefined }).subscribe({
       next: () => {
         this.saving.set(false);
         this.showForm.set(false);

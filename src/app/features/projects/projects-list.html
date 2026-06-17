@@ -1,0 +1,36 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Projects</h1>
+    <gw-button variant="primary" leadingIcon="Plus" (click)="toggleForm()">New project</gw-button>
+  </div>
+
+  @if (showForm()) {
+    <gw-card padding="lg" class="mb-4">
+      <div class="form-grid" [formGroup]="form">
+        <gw-form-field label="Customer" class="field--full">
+          <gw-select formControlName="customerId" [options]="customerOptions()" placeholder="Select customer" />
+        </gw-form-field>
+        <gw-form-field label="Project name">
+          <gw-input formControlName="name" placeholder="e.g. Conveyor Line 2026" />
+        </gw-form-field>
+        <gw-form-field label="Target date">
+          <gw-date-input formControlName="targetDate" />
+        </gw-form-field>
+        <gw-form-field label="Description" class="field--full">
+          <gw-input formControlName="description" placeholder="Optional" />
+        </gw-form-field>
+      </div>
+      @if (error()) { <gw-alert class="mt-3" variant="danger" [title]="error()" /> }
+      <div class="form-actions mt-3">
+        <gw-button variant="ghost" (click)="toggleForm()">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="saving()" [disabled]="form.invalid" (click)="create()">Create project</gw-button>
+      </div>
+    </gw-card>
+  }
+
+  <gw-card padding="none">
+    <gw-table [columns]="columns" [data]="rows()" [loading]="loading()" (rowClick)="open($event)"
+      emptyText="No projects yet"
+      emptyHint="Group a customer's inquiries, quotes and orders under a project — the code is allocated automatically." />
+  </gw-card>
+</div>

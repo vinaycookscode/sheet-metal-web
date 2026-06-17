@@ -10,8 +10,8 @@
   @if (showForm()) {
     <gw-card padding="lg" class="mb-4">
       <form [formGroup]="form" (ngSubmit)="create()" class="form-grid">
-        <gw-form-field label="Code" [required]="true">
-          <gw-input formControlName="code" placeholder="CUST-010" />
+        <gw-form-field label="Code" hint="Leave blank to auto-generate (CUST-…)">
+          <gw-input formControlName="code" placeholder="Auto" />
         </gw-form-field>
         <gw-form-field label="Name" [required]="true">
           <gw-input formControlName="name" placeholder="Acme Pvt Ltd" />

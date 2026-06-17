@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { InquiriesService } from '../../core/inquiries.service';
 import { CustomersService } from '../../core/customers.service';
+import { ProjectsService } from '../../core/projects.service';
 import { GwCardComponent } from '../../shared/ui/display/card/card.component';
 import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 import { GwIconButtonComponent } from '../../shared/ui/buttons/icon-button/icon-button.component';
@@ -23,12 +25,17 @@ import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component
     GwFormFieldComponent, GwInputComponent, GwDateInputComponent, GwSelectComponent, GwAlertComponent,
   ],
   templateUrl: './inquiries-list.html',
-  styles: [`.line-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:center;margin-bottom:10px}`],
+  styles: [`
+    .line-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:center;margin-bottom:10px}
+    .inline-add{display:flex;gap:8px;align-items:center;margin-top:6px}
+    .inline-add gw-input{flex:1}
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InquiriesListPage implements OnInit {
   private readonly svc = inject(InquiriesService);
   private readonly customersSvc = inject(CustomersService);
+  private readonly projectsSvc = inject(ProjectsService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
 
@@ -38,7 +45,16 @@ export class InquiriesListPage implements OnInit {
   readonly saving = signal(false);
   readonly error = signal('');
   readonly customerOptions = signal<GwSelectOption[]>([]);
+  readonly projectOptions = signal<GwSelectOption[]>([]);
   readonly today = new Date().toISOString().slice(0, 10);
+
+  // inline quick-create
+  readonly showNewCustomer = signal(false);
+  readonly showNewProject = signal(false);
+  readonly addingCustomer = signal(false);
+  readonly addingProject = signal(false);
+  readonly newCustomerName = this.fb.control('', { nonNullable: true });
+  readonly newProjectName = this.fb.control('', { nonNullable: true });
 
   readonly columns: GwTableColumn[] = [
     { key: 'number', label: 'Inquiry #', width: '160px' },
@@ -52,10 +68,21 @@ export class InquiriesListPage implements OnInit {
 
   readonly form = this.fb.nonNullable.group({
     customerId: ['', Validators.required],
+    projectId: ['', Validators.required],
     requiredDate: [''],
     notes: [''],
     lines: this.fb.array([this.newLine()]),
   });
+
+  constructor() {
+    // Projects are scoped to the chosen customer; reload the picker when it changes.
+    this.form.controls.customerId.valueChanges.pipe(takeUntilDestroyed()).subscribe((customerId) => {
+      this.form.controls.projectId.setValue('');
+      this.projectOptions.set([]);
+      this.showNewProject.set(false);
+      if (customerId) this.loadProjects(customerId);
+    });
+  }
 
   get lines(): FormArray {
     return this.form.controls.lines;
@@ -93,6 +120,46 @@ export class InquiriesListPage implements OnInit {
     });
   }
 
+  private loadProjects(customerId: string): void {
+    this.projectsSvc.list({ customerId }).subscribe((projects) => {
+      this.projectOptions.set(projects.map((p) => ({ value: p.id, label: `${p.code} — ${p.name}` })));
+    });
+  }
+
+  // ── inline quick-create ──
+  addCustomerInline(): void {
+    const name = this.newCustomerName.value.trim();
+    if (!name || this.addingCustomer()) return;
+    this.addingCustomer.set(true);
+    this.customersSvc.create({ name }).subscribe({
+      next: (c) => {
+        this.customerOptions.update((opts) => [...opts, { value: c.id, label: `${c.code} — ${c.name}` }]);
+        this.form.controls.customerId.setValue(c.id);
+        this.newCustomerName.setValue('');
+        this.showNewCustomer.set(false);
+        this.addingCustomer.set(false);
+      },
+      error: (e) => { this.addingCustomer.set(false); this.error.set(e?.error?.message ?? 'Failed to add customer'); },
+    });
+  }
+
+  addProjectInline(): void {
+    const name = this.newProjectName.value.trim();
+    const customerId = this.form.controls.customerId.value;
+    if (!name || !customerId || this.addingProject()) return;
+    this.addingProject.set(true);
+    this.projectsSvc.create({ customerId, name }).subscribe({
+      next: (p) => {
+        this.projectOptions.update((opts) => [...opts, { value: p.id, label: `${p.code} — ${p.name}` }]);
+        this.form.controls.projectId.setValue(p.id);
+        this.newProjectName.setValue('');
+        this.showNewProject.set(false);
+        this.addingProject.set(false);
+      },
+      error: (e) => { this.addingProject.set(false); this.error.set(e?.error?.message ?? 'Failed to add project'); },
+    });
+  }
+
   newLine() {
     return this.fb.nonNullable.group({
       partName: ['', Validators.required],
@@ -114,11 +181,11 @@ export class InquiriesListPage implements OnInit {
     this.saving.set(true);
     this.error.set('');
     const v = this.form.getRawValue();
-    this.svc.create({ customerId: v.customerId, requiredDate: v.requiredDate || undefined, notes: v.notes || undefined, lines: v.lines }).subscribe({
+    this.svc.create({ customerId: v.customerId, projectId: v.projectId, requiredDate: v.requiredDate || undefined, notes: v.notes || undefined, lines: v.lines }).subscribe({
       next: () => {
         this.saving.set(false);
         this.showForm.set(false);
-        this.form.reset({ customerId: '', requiredDate: '', notes: '' });
+        this.form.reset({ customerId: '', projectId: '', requiredDate: '', notes: '' });
         this.lines.clear();
         this.lines.push(this.newLine());
         this.load();

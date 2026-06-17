@@ -13,7 +13,33 @@
         <div class="form-grid">
           <gw-form-field label="Customer" [required]="true">
             <gw-select formControlName="customerId" [options]="customerOptions()" placeholder="Select customer" />
+            @if (!showNewCustomer()) {
+              <gw-button variant="ghost" size="sm" leadingIcon="Plus" type="button" (click)="showNewCustomer.set(true)">New customer</gw-button>
+            } @else {
+              <div class="inline-add">
+                <gw-input [formControl]="newCustomerName" placeholder="New customer name" />
+                <gw-button variant="secondary" size="sm" type="button" [loading]="addingCustomer()" (click)="addCustomerInline()">Add</gw-button>
+                <gw-button variant="ghost" size="sm" type="button" (click)="showNewCustomer.set(false)">Cancel</gw-button>
+              </div>
+            }
           </gw-form-field>
+
+          <gw-form-field label="Project" [required]="true">
+            <gw-select formControlName="projectId" [options]="projectOptions()"
+              [placeholder]="form.controls.customerId.value ? 'Select project' : 'Pick a customer first'" />
+            @if (form.controls.customerId.value) {
+              @if (!showNewProject()) {
+                <gw-button variant="ghost" size="sm" leadingIcon="Plus" type="button" (click)="showNewProject.set(true)">New project</gw-button>
+              } @else {
+                <div class="inline-add">
+                  <gw-input [formControl]="newProjectName" placeholder="New project name" />
+                  <gw-button variant="secondary" size="sm" type="button" [loading]="addingProject()" (click)="addProjectInline()">Add</gw-button>
+                  <gw-button variant="ghost" size="sm" type="button" (click)="showNewProject.set(false)">Cancel</gw-button>
+                </div>
+              }
+            }
+          </gw-form-field>
+
           <gw-form-field label="Required date">
             <gw-date-input formControlName="requiredDate" [min]="today" />
           </gw-form-field>

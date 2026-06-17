@@ -26,6 +26,8 @@ export const routes: Routes = [
       { path: 'quotes/:id', loadComponent: () => import('./features/quotes/quote-detail').then((m) => m.QuoteDetailPage) },
       { path: 'sales-orders', loadComponent: () => import('./features/sales-orders/so-list').then((m) => m.SoListPage) },
       { path: 'sales-orders/:id', loadComponent: () => import('./features/sales-orders/so-detail').then((m) => m.SoDetailPage) },
+      { path: 'projects', loadComponent: () => import('./features/projects/projects-list').then((m) => m.ProjectsListPage) },
+      { path: 'projects/:id', loadComponent: () => import('./features/projects/project-detail').then((m) => m.ProjectDetailPage) },
       { path: 'parts', loadComponent: () => import('./features/engineering/parts-list').then((m) => m.PartsListPage) },
       { path: 'parts/:id', loadComponent: () => import('./features/engineering/part-detail').then((m) => m.PartDetailPage) },
       { path: 'work-orders', loadComponent: () => import('./features/work-orders/wo-list').then((m) => m.WoListPage) },

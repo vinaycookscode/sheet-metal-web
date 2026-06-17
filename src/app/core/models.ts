@@ -61,12 +61,38 @@ export interface Customer {
 }
 
 export interface CreateCustomer {
-  code: string;
+  /** Optional — auto-allocated (CUST-...) by the API when omitted. */
+  code?: string;
   name: string;
   gstin?: string;
   stateCode?: string;
   paymentTermsDays?: number;
   creditLimit?: number;
+}
+
+export interface Project {
+  id: string;
+  code: string;
+  name: string;
+  customerId: string;
+  status: string;
+  description?: string;
+  targetDate?: string;
+  createdAt: string;
+}
+export interface CreateProject {
+  customerId: string;
+  name: string;
+  code?: string;
+  status?: string;
+  description?: string;
+  targetDate?: string;
+}
+export interface ProjectSummary {
+  project: Project;
+  customer: { id: string; name: string; code: string } | null;
+  counts: { inquiries: number; quotes: number; salesOrders: number; openSalesOrders: number };
+  orderValue: number;
 }
 
 export interface Supplier {
@@ -93,7 +119,7 @@ export interface InquiryLine {
   materialGradeId?: string; thicknessMm?: number; finishId?: string; targetPrice?: number;
 }
 export interface Inquiry {
-  id: string; number: string; customerId: string; status: string;
+  id: string; number: string; customerId: string; projectId?: string; status: string;
   requiredDate?: string; ownerId?: string; estimatorId?: string; lostReason?: string;
   notes?: string; lines?: InquiryLine[]; createdAt: string;
 }
@@ -101,7 +127,7 @@ export interface CreateInquiryLine {
   partName: string; qty: number; materialGradeId?: string; thicknessMm?: number; finishId?: string; targetPrice?: number;
 }
 export interface CreateInquiry {
-  customerId: string; requiredDate?: string; notes?: string; lines: CreateInquiryLine[];
+  customerId: string; projectId: string; requiredDate?: string; notes?: string; lines: CreateInquiryLine[];
 }
 
 export interface QuoteLine {
@@ -114,7 +140,7 @@ export interface QuoteVersion {
   subtotal: number; taxTotal: number; grandTotal: number; isCurrent: boolean; lines?: QuoteLine[];
 }
 export interface Quote {
-  id: string; number: string; customerId: string; inquiryId?: string;
+  id: string; number: string; customerId: string; projectId?: string; inquiryId?: string;
   currentVersion: number; status: string; winLossReason?: string; versions?: QuoteVersion[]; createdAt: string;
 }
 
@@ -123,7 +149,7 @@ export interface SoLine {
   promisedDate?: string; status: string; taxCodeId?: string; quoteLineId?: string; partId?: string;
 }
 export interface SalesOrder {
-  id: string; number: string; customerId: string; status: string;
+  id: string; number: string; customerId: string; projectId?: string; status: string;
   customerPoNumber?: string; vendorCode?: string; orderDate: string; lines?: SoLine[]; createdAt: string;
 }
 

@@ -1,0 +1,36 @@
+<div class="page">
+  <a routerLink="/projects" class="muted" style="text-decoration:none">← Projects</a>
+
+  @if (loading()) {
+    <p class="muted mt-3">Loading…</p>
+  } @else if (summary(); as s) {
+    <div class="page-header mt-2">
+      <div class="d-flex items-center gap-3">
+        <h1>{{ s.project.name }}</h1>
+        <gw-badge [variant]="$any(statusVariant(s.project.status))">{{ s.project.status }}</gw-badge>
+      </div>
+      <span class="muted">{{ s.project.code }}</span>
+    </div>
+
+    <p class="muted mb-3">
+      Customer:
+      @if (s.customer) { <a [routerLink]="['/customers']">{{ s.customer.code }} — {{ s.customer.name }}</a> }
+      @else { — }
+      @if (s.project.targetDate) { · target {{ s.project.targetDate }} }
+    </p>
+
+    <div class="stat-grid mb-4">
+      <gw-card padding="md"><p class="muted">Inquiries</p><p class="stat">{{ s.counts.inquiries }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Quotes</p><p class="stat">{{ s.counts.quotes }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Sales orders</p><p class="stat">{{ s.counts.salesOrders }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Open orders</p><p class="stat">{{ s.counts.openSalesOrders }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Order value</p><p class="stat">₹{{ s.orderValue | number:'1.0-0' }}</p></gw-card>
+    </div>
+
+    @if (s.project.description) {
+      <gw-card padding="lg"><p class="muted">Description</p><p>{{ s.project.description }}</p></gw-card>
+    }
+  } @else {
+    <gw-alert class="mt-3" variant="danger" title="Project not found" />
+  }
+</div>
