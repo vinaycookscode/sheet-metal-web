@@ -183,7 +183,11 @@ export class InquiriesListPage implements OnInit {
     if (this.saving()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.error.set('Please complete the required fields: a customer, a project, and at least one line.');
+      const missing: string[] = [];
+      if (this.form.controls.customerId.invalid) missing.push('a customer');
+      if (this.form.controls.projectId.invalid) missing.push('a project');
+      if (this.lines.invalid) missing.push('every line needs a part name and a quantity ≥ 0.001');
+      this.error.set(`Please complete: ${missing.join('; ')}.`);
       return;
     }
     this.saving.set(true);
