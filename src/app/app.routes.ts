@@ -38,6 +38,7 @@ export const routes: Routes = [
       { path: 'work-orders', loadComponent: () => import('./features/work-orders/wo-list').then((m) => m.WoListPage) },
       { path: 'work-orders/:id', loadComponent: () => import('./features/work-orders/wo-detail').then((m) => m.WoDetailPage) },
       { path: 'production-board', loadComponent: () => import('./features/production/production-board').then((m) => m.ProductionBoardPage) },
+      { path: 'plant-performance', loadComponent: () => import('./features/analytics/production-intelligence').then((m) => m.ProductionIntelligencePage) },
       { path: 'rfqs', loadComponent: () => import('./features/procurement/rfq-list').then((m) => m.RfqListPage) },
       { path: 'rfqs/:id', loadComponent: () => import('./features/procurement/rfq-detail').then((m) => m.RfqDetailPage) },
       { path: 'purchase-orders', loadComponent: () => import('./features/procurement/po-list').then((m) => m.PoListPage) },

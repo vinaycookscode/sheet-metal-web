@@ -1,0 +1,47 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Plant Performance</h1>
+      <p class="muted">OEE, scrap/yield and downtime — last 30 days.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="muted mt-3">Loading…</p>
+  } @else if (data(); as d) {
+    <div class="stat-grid mb-4">
+      <gw-card padding="md"><p class="muted">OEE</p><p class="stat stat--oee">{{ pct(d.plant.oeePct) }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Availability</p><p class="stat">{{ pct(d.plant.availabilityPct) }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Performance</p><p class="stat">{{ pct(d.plant.performancePct) }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Quality</p><p class="stat">{{ pct(d.plant.qualityPct) }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Scrap</p><p class="stat">{{ pct(d.plant.scrapPct) }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Yield</p><p class="stat">{{ pct(d.plant.yieldPct) }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">WIP (work orders)</p><p class="stat">{{ d.plant.wip }}</p></gw-card>
+      <gw-card padding="md"><p class="muted">Downtime (h)</p><p class="stat">{{ d.plant.downtimeHours | number:'1.0-1' }}</p></gw-card>
+    </div>
+
+    <p class="muted mb-2">By work centre</p>
+    <gw-card padding="none" class="mb-4">
+      <gw-table [columns]="columns" [data]="rows()" emptyText="No production recorded in this window" />
+    </gw-card>
+
+    @if (d.downtimeByReason.length) {
+      <p class="muted mb-2">Downtime by reason</p>
+      <gw-card padding="lg">
+        <div class="dt-list">
+          @for (r of d.downtimeByReason; track r.reason) {
+            <div>
+              <div class="dt-row">
+                <span>{{ reasonLabel(r.reason) }} <span class="muted">· {{ r.count }}×</span></span>
+                <strong>{{ r.hours | number:'1.0-1' }} h</strong>
+              </div>
+              <div class="dt-bar" [style.width.%]="(r.hours / maxReasonHours()) * 100"></div>
+            </div>
+          }
+        </div>
+      </gw-card>
+    }
+  } @else {
+    <p class="muted mt-3">Could not load production data.</p>
+  }
+</div>

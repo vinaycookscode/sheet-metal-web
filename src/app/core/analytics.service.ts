@@ -13,6 +13,21 @@ export interface Profitability {
   totals: { revenue: number; actualCost: number; margin: number; marginPct: number | null };
 }
 
+export interface OeeWorkCenter {
+  workCenterId: string; workCenter: string;
+  runHours: number; downtimeHours: number; good: number; scrap: number;
+  availabilityPct: number | null; performancePct: number | null; qualityPct: number | null; oeePct: number | null;
+}
+export interface ProductionIntelligence {
+  from: string; to: string;
+  plant: {
+    oeePct: number | null; availabilityPct: number | null; performancePct: number | null; qualityPct: number | null;
+    scrapPct: number | null; yieldPct: number | null; runHours: number; downtimeHours: number; good: number; scrap: number; wip: number;
+  };
+  workCenters: OeeWorkCenter[];
+  downtimeByReason: Array<{ reason: string; hours: number; count: number }>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AnalyticsService {
   private readonly http = inject(HttpClient);
@@ -20,4 +35,8 @@ export class AnalyticsService {
 
   kpis() { return this.http.get<Kpis>(`${this.base}/kpis`); }
   profitability() { return this.http.get<Profitability>(`${this.base}/profitability`); }
+  production(from?: string, to?: string) {
+    const qs = [from ? `from=${from}` : '', to ? `to=${to}` : ''].filter(Boolean).join('&');
+    return this.http.get<ProductionIntelligence>(`${this.base}/production${qs ? '?' + qs : ''}`);
+  }
 }

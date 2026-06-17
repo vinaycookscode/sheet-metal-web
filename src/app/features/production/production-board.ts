@@ -1,26 +1,32 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ProductionService, BoardGroup } from '../../core/production.service';
+import { DatePipe } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ProductionService, BoardGroup, DowntimeEvent, DOWNTIME_REASONS } from '../../core/production.service';
+import { MetaService } from '../../core/meta.service';
 import { GwCardComponent } from '../../shared/ui/display/card/card.component';
 import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
 import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwSelectComponent, GwSelectOption } from '../../shared/ui/forms/select/select.component';
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
 
 @Component({
   selector: 'app-production-board',
   standalone: true,
-  imports: [ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwInputComponent, GwAlertComponent],
+  imports: [DatePipe, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwInputComponent, GwSelectComponent, GwAlertComponent],
   templateUrl: './production-board.html',
   styles: [`
     .op-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border,#eee)}
     .op-row:last-child{border-bottom:none}
     .clockoff{display:grid;grid-template-columns:1fr 1fr 2fr auto auto;gap:8px;align-items:center;padding:10px;background:var(--surface-input,#f4f4f5);border-radius:8px;margin:6px 0}
+    .dt-bar{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+    .dt-open{display:flex;align-items:center;gap:10px;padding:8px 10px;background:color-mix(in srgb,var(--color-warning,#f59e0b) 12%,transparent);border-radius:8px;margin-top:8px}
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductionBoardPage implements OnInit {
   private readonly svc = inject(ProductionService);
+  private readonly meta = inject(MetaService);
   private readonly fb = inject(FormBuilder);
 
   readonly groups = signal<BoardGroup[]>([]);
@@ -31,7 +37,17 @@ export class ProductionBoardPage implements OnInit {
 
   readonly form = this.fb.nonNullable.group({ qtyGood: [0], qtyScrap: [0], scrapReason: [''] });
 
-  ngOnInit(): void { this.load(); }
+  // Downtime capture
+  readonly workCenters = signal<GwSelectOption[]>([]);
+  readonly openDowntimes = signal<DowntimeEvent[]>([]);
+  readonly reasonOptions = DOWNTIME_REASONS;
+  readonly downtimeForm = this.fb.nonNullable.group({ workCenterId: ['', Validators.required], reason: ['breakdown', Validators.required], notes: [''] });
+
+  ngOnInit(): void {
+    this.load();
+    this.meta.workCenters().subscribe((wcs) => this.workCenters.set(wcs.map((w) => ({ value: w.id, label: `${w.code} — ${w.name}` }))));
+    this.loadDowntime();
+  }
 
   load(): void {
     this.loading.set(true);
@@ -40,6 +56,27 @@ export class ProductionBoardPage implements OnInit {
       error: () => this.loading.set(false),
     });
   }
+
+  private loadDowntime(): void {
+    this.svc.openDowntime().subscribe({ next: (d) => this.openDowntimes.set(d), error: () => { /* best-effort */ } });
+  }
+
+  startDowntime(): void {
+    if (this.downtimeForm.invalid) { this.downtimeForm.markAllAsTouched(); return; }
+    const v = this.downtimeForm.getRawValue();
+    this.error.set('');
+    this.svc.startDowntime({ workCenterId: v.workCenterId, reason: v.reason, notes: v.notes || undefined }).subscribe({
+      next: () => { this.downtimeForm.reset({ workCenterId: '', reason: 'breakdown', notes: '' }); this.loadDowntime(); },
+      error: (e) => this.error.set(e?.error?.message ?? 'Could not start downtime'),
+    });
+  }
+
+  endDowntime(id: string): void {
+    this.svc.endDowntime(id).subscribe({ next: () => this.loadDowntime(), error: (e) => this.error.set(e?.error?.message ?? 'Could not end downtime') });
+  }
+
+  wcLabel(id: string): string { return this.workCenters().find((w) => w.value === id)?.label ?? id; }
+  reasonLabel(r: string): string { return this.reasonOptions.find((o) => o.value === r)?.label ?? r; }
 
   clockOn(opId: string): void {
     this.error.set('');

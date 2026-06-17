@@ -9,6 +9,25 @@
 
   @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
 
+  <!-- Downtime capture (feeds OEE on Plant Performance) -->
+  <gw-card padding="lg" class="mb-4">
+    <p class="muted" style="margin-top:0">Log downtime</p>
+    <div class="dt-bar" [formGroup]="downtimeForm">
+      <gw-select formControlName="workCenterId" [options]="workCenters()" placeholder="Work centre" />
+      <gw-select formControlName="reason" [options]="reasonOptions" placeholder="Reason" />
+      <gw-input formControlName="notes" placeholder="Notes (optional)" />
+      <gw-button variant="secondary" leadingIcon="AlertTriangle" (click)="startDowntime()">Start downtime</gw-button>
+    </div>
+    @for (d of openDowntimes(); track d.id) {
+      <div class="dt-open">
+        <strong>{{ wcLabel(d.workCenterId) }}</strong>
+        <span>{{ reasonLabel(d.reason) }}</span>
+        <span class="muted">since {{ d.startedAt | date:'HH:mm' }}</span>
+        <gw-button variant="ghost" size="sm" (click)="endDowntime(d.id)">End</gw-button>
+      </div>
+    }
+  </gw-card>
+
   @if (loading()) {
     <p class="muted">Loading…</p>
   } @else if (!groups().length) {

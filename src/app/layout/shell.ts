@@ -77,6 +77,7 @@ export class ShellComponent {
         { key: 'work-orders', label: 'Work Orders', icon: 'ClipboardCheck', link: '/work-orders', perms: ['wo.read'] },
         { key: 'capacity', label: 'Capacity', icon: 'Gauge', link: '/capacity', perms: ['wo.read'] },
         { key: 'production-board', label: 'Production', icon: 'LayoutGrid', link: '/production-board', perms: ['mes.read', 'wo.read'] },
+        { key: 'plant-performance', label: 'Plant Performance', icon: 'ChartBar', link: '/plant-performance', perms: ['mes.read'] },
         { key: 'rfqs', label: 'Supplier RFQs', icon: 'FileSearch', link: '/rfqs', perms: ['po.read'] },
         { key: 'purchase-orders', label: 'Purchasing', icon: 'Receipt', link: '/purchase-orders', perms: ['po.read'] },
         { key: 'stock', label: 'Inventory', icon: 'Warehouse', link: '/stock', perms: ['stock.read'] },
