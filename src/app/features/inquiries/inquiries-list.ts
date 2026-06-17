@@ -123,6 +123,9 @@ export class InquiriesListPage implements OnInit {
   private loadProjects(customerId: string): void {
     this.projectsSvc.list({ customerId }).subscribe((projects) => {
       this.projectOptions.set(projects.map((p) => ({ value: p.id, label: `${p.code} — ${p.name}` })));
+      // Common case: the customer has one project — pick it so the user isn't blocked.
+      if (projects.length === 1) this.form.controls.projectId.setValue(projects[0].id);
+      else if (projects.length === 0) this.showNewProject.set(true);
     });
   }
 
@@ -177,7 +180,12 @@ export class InquiriesListPage implements OnInit {
   }
 
   create(): void {
-    if (this.form.invalid || this.saving()) return;
+    if (this.saving()) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.error.set('Please complete the required fields: a customer, a project, and at least one line.');
+      return;
+    }
     this.saving.set(true);
     this.error.set('');
     const v = this.form.getRawValue();
