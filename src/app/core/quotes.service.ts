@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Quote, QuoteDocument, QuoteFollowup, RecordQuoteResponse, SendQuoteEmail, SendQuoteEmailResult } from './models';
+import { Quote, QuoteDocument, QuoteFollowup, RecordQuoteResponse, ReviseQuote, SendQuoteEmail, SendQuoteEmailResult } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class QuotesService {
@@ -37,6 +37,10 @@ export class QuotesService {
   }
   createFromInquiry(inquiryId: string) {
     return this.http.post<Quote>(this.base, { inquiryId });
+  }
+  /** Create a new version (e.g. after the customer bargains) — sets the quote back to draft. */
+  revise(id: string, dto: ReviseQuote) {
+    return this.http.post<Quote>(`${this.base}/${id}/revise`, dto);
   }
   setStatus(id: string, status: 'sent' | 'accepted' | 'rejected' | 'expired', winLossReason?: string) {
     return this.http.post<Quote>(`${this.base}/${id}/status`, { status, winLossReason });

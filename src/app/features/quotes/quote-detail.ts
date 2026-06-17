@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { QuotesService } from '../../core/quotes.service';
 import { SalesOrdersService } from '../../core/sales-orders.service';
@@ -37,6 +37,9 @@ import { QuotePrintPage } from './quote-print';
     .tl-dot { width:10px; height:10px; border-radius:50%; background:var(--color-primary,#2563eb); margin-top:5px; flex:none; }
     .tl-body { flex:1; }
     .tl-head { font-size:.9rem; margin-bottom:.15rem; }
+    .rev-lines { width:100%; border-collapse:collapse; }
+    .rev-lines th { text-align:left; font-size:.8rem; color:var(--text-secondary,#666); padding:4px 8px; }
+    .rev-lines td { padding:4px 8px; border-top:1px solid var(--border,#e5e7eb); vertical-align:middle; }
   `],
 })
 export class QuoteDetailPage implements OnInit {
@@ -91,11 +94,53 @@ export class QuoteDetailPage implements OnInit {
     return { sent: 'Sent', accepted: 'Accepted', rejected: 'Rejected', negotiating: 'Negotiating', follow_up: 'Follow-up', note: 'Note', revised: 'Revised' }[k] ?? k;
   }
 
+  // Revise → new version (edit line prices / validity / terms, then re-send)
+  readonly showRevise = signal(false);
+  readonly revising = signal(false);
+  readonly reviseForm = this.fb.nonNullable.group({ validUntil: '', leadTimeDays: [null as number | null], terms: '' });
+  readonly reviseLines: FormArray = this.fb.array<FormGroup>([]);
+
+  openRevise(): void {
+    const v = this.current();
+    this.reviseLines.clear();
+    for (const l of v?.lines ?? []) {
+      this.reviseLines.push(this.fb.nonNullable.group({
+        partName: l.partName,
+        primaryQty: [l.primaryQty, [Validators.required, Validators.min(0)]],
+        unitPrice: [l.unitPrice, [Validators.required, Validators.min(0)]],
+        taxCodeId: l.taxCodeId ?? '',
+      }));
+    }
+    this.reviseForm.reset({ validUntil: v?.validUntil ?? '', leadTimeDays: v?.leadTimeDays ?? null, terms: v?.terms ?? '' });
+    this.error.set('');
+    this.showRevise.set(true);
+  }
+
+  revise(): void {
+    if (this.revising() || this.reviseLines.invalid) return;
+    this.revising.set(true);
+    this.error.set('');
+    const h = this.reviseForm.getRawValue();
+    const lines = this.reviseLines.controls.map((c) => {
+      const l = c.getRawValue();
+      return { partName: l.partName, primaryQty: Number(l.primaryQty), unitPrice: Number(l.unitPrice), taxCodeId: l.taxCodeId || undefined };
+    });
+    this.svc.revise(this.id, {
+      validUntil: h.validUntil || undefined,
+      leadTimeDays: h.leadTimeDays ?? undefined,
+      terms: h.terms || undefined,
+      lines,
+    }).subscribe({
+      next: (q) => { this.revising.set(false); this.showRevise.set(false); this.quote.set(q); this.loadTimeline(); },
+      error: (e) => { this.revising.set(false); this.error.set(e?.error?.message ?? 'Failed to revise the quote'); },
+    });
+  }
+
   readonly current = computed<QuoteVersion | null>(() => this.quote()?.versions?.find((v) => v.isCurrent) ?? null);
 
   readonly journeyStages = JOURNEY_STAGES;
-  /** A forward action is available (open the order, or a draft/sent/accepted step). */
-  readonly hasActions = computed(() => !!this.quote()?.salesOrder || ['draft', 'sent', 'accepted'].includes(this.quote()?.status ?? ''));
+  /** A forward action is available (open the order, or a draft/sent/accepted/negotiating step). */
+  readonly hasActions = computed(() => !!this.quote()?.salesOrder || ['draft', 'sent', 'accepted', 'negotiating'].includes(this.quote()?.status ?? ''));
   /** Plain-language "what to do next" for the guided bar. */
   readonly hint = computed(() => {
     const q = this.quote();
@@ -103,6 +148,7 @@ export class QuoteDetailPage implements OnInit {
     switch (q?.status) {
       case 'draft': return 'Send the quote to the customer.';
       case 'sent': return "Awaiting the customer's decision — accept it, then create the sales order.";
+      case 'negotiating': return 'Customer is negotiating — revise the prices/terms and re-send a new version.';
       case 'accepted': return 'Accepted — create the sales order.';
       case 'rejected': return 'Rejected — no further action.';
       case 'expired': return 'Expired — revise it to re-quote.';

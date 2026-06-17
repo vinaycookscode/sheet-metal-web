@@ -198,6 +198,21 @@ export interface PublicRespond {
   message?: string;
 }
 
+/** A line in a quote revision (new version). */
+export interface ReviseQuoteLine {
+  partName: string;
+  primaryQty: number;
+  unitPrice: number;
+  taxCodeId?: string;
+}
+export interface ReviseQuote {
+  validUntil?: string;
+  leadTimeDays?: number;
+  markupPct?: number;
+  terms?: string;
+  lines?: ReviseQuoteLine[];
+}
+
 /** What an internal user records as the customer's response. */
 export interface RecordQuoteResponse {
   action: 'accept' | 'reject' | 'negotiate' | 'follow_up' | 'note';

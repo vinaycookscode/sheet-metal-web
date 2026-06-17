@@ -14,6 +14,7 @@
         <gw-button variant="ghost" leadingIcon="Eye" (click)="showDoc.set(true)">Preview / Print</gw-button>
         @if (q.status === 'sent' || q.status === 'negotiating') {
           <gw-button variant="ghost" leadingIcon="MessageSquare" (click)="openRecord()">Record response</gw-button>
+          <gw-button variant="ghost" leadingIcon="RefreshCw" (click)="openRevise()">Revise</gw-button>
         }
       </div>
     </div>
@@ -29,6 +30,9 @@
       }
       @if (!q.salesOrder && (q.status === 'sent' || q.status === 'accepted')) {
         <gw-button primary-action variant="primary" leadingIcon="ClipboardList" [loading]="busy()" (click)="createSO()">Create sales order</gw-button>
+      }
+      @if (!q.salesOrder && q.status === 'negotiating') {
+        <gw-button primary-action variant="primary" leadingIcon="RefreshCw" (click)="openRevise()">Revise &amp; re-send</gw-button>
       }
       @if (!q.salesOrder && q.status === 'sent') {
         <ng-container secondary-actions>
@@ -155,6 +159,34 @@
       <div gw-dialog-footer class="d-flex gap-2" style="justify-content:flex-end">
         <gw-button variant="ghost" (click)="showRecord.set(false)">Cancel</gw-button>
         <gw-button variant="primary" [loading]="recording()" (click)="record()">Save response</gw-button>
+      </div>
+    </gw-dialog>
+
+    <!-- Revise → new version -->
+    <gw-dialog [open]="showRevise()" size="lg" title="Revise quote — new version"
+      description="Adjust prices/terms and create a new version to re-send. The quote returns to draft."
+      (openChange)="showRevise.set($event)">
+      <div [formGroup]="reviseForm" class="form-grid" style="margin-bottom:14px">
+        <gw-form-field label="Valid until"><gw-date-input formControlName="validUntil" /></gw-form-field>
+        <gw-form-field label="Lead time (days)"><gw-input type="number" formControlName="leadTimeDays" /></gw-form-field>
+        <gw-form-field label="Terms" class="field--full"><gw-input formControlName="terms" placeholder="Optional" /></gw-form-field>
+      </div>
+      <table class="rev-lines">
+        <thead><tr><th>Part</th><th style="width:120px">Qty</th><th style="width:150px">Unit ₹</th></tr></thead>
+        <tbody>
+          @for (ln of reviseLines.controls; track $index) {
+            <tr [formGroup]="$any(ln)">
+              <td>{{ ln.value.partName }}</td>
+              <td><gw-input type="number" formControlName="primaryQty" /></td>
+              <td><gw-input type="number" formControlName="unitPrice" /></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (error()) { <gw-alert class="mt-3" variant="danger" [title]="error()" /> }
+      <div gw-dialog-footer class="d-flex gap-2" style="justify-content:flex-end">
+        <gw-button variant="ghost" (click)="showRevise.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" leadingIcon="RefreshCw" [loading]="revising()" (click)="revise()">Create new version</gw-button>
       </div>
     </gw-dialog>
   } @else {
