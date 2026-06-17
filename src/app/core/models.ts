@@ -186,19 +186,6 @@ export interface QuoteFollowup {
   createdAt: string;
 }
 
-/** One row in the cross-quote Follow-ups list. */
-export interface QuoteFollowupRow {
-  id: string;
-  number: string;
-  customerId: string;
-  customerName: string;
-  status: string;
-  grandTotal: number;
-  nextFollowUpDate?: string | null;
-  responseCount: number;
-  lastResponse: { kind: string; source: string; note?: string | null; counterAmount?: number | null; createdAt: string } | null;
-}
-
 /** Public (customer-facing) quote view. */
 export interface PublicQuoteView extends QuoteDocument {
   status: string;
