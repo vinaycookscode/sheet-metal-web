@@ -9,6 +9,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/login').then((m) => m.LoginPage),
   },
   {
+    // Public, unauthenticated customer quote response (token link from the email).
+    path: 'quote-response/:token',
+    loadComponent: () => import('./pages/quote-response/quote-response').then((m) => m.QuoteResponsePage),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () => import('./layout/shell').then((m) => m.ShellComponent),

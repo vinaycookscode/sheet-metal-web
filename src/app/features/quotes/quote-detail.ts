@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { QuotesService } from '../../core/quotes.service';
 import { SalesOrdersService } from '../../core/sales-orders.service';
-import { Quote, QuoteVersion, SendQuoteEmailResult } from '../../core/models';
+import { Quote, QuoteVersion, QuoteFollowup, SendQuoteEmailResult } from '../../core/models';
 import { GwCardComponent } from '../../shared/ui/display/card/card.component';
 import { GwButtonComponent } from '../../shared/ui/buttons/button/button.component';
 import { GwBadgeComponent } from '../../shared/ui/display/badge/badge.component';
@@ -12,6 +13,8 @@ import { GwTableComponent, GwTableColumn } from '../../shared/ui/data/table/tabl
 import { GwAlertComponent } from '../../shared/ui/feedback/alert/alert.component';
 import { GwFormFieldComponent } from '../../shared/ui/forms/form-field/form-field.component';
 import { GwInputComponent } from '../../shared/ui/forms/input/input.component';
+import { GwDateInputComponent } from '../../shared/ui/forms/date-input/date-input.component';
+import { GwSelectComponent, GwSelectOption } from '../../shared/ui/forms/select/select.component';
 import { GwDrawerComponent } from '../../shared/ui/overlays/drawer/drawer.component';
 import { GwDialogComponent } from '../../shared/ui/overlays/dialog/dialog.component';
 import { NextActionBarComponent } from '../../shared/next-action-bar/next-action-bar';
@@ -22,12 +25,19 @@ import { QuotePrintPage } from './quote-print';
   selector: 'app-quote-detail',
   standalone: true,
   imports: [
-    RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent,
-    GwAlertComponent, GwFormFieldComponent, GwInputComponent, GwDrawerComponent, GwDialogComponent,
-    NextActionBarComponent, QuotePrintPage,
+    CommonModule, RouterLink, ReactiveFormsModule, GwCardComponent, GwButtonComponent, GwBadgeComponent, GwTableComponent,
+    GwAlertComponent, GwFormFieldComponent, GwInputComponent, GwDateInputComponent, GwSelectComponent,
+    GwDrawerComponent, GwDialogComponent, NextActionBarComponent, QuotePrintPage,
   ],
   templateUrl: './quote-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    .timeline { display:flex; flex-direction:column; gap:1rem; }
+    .tl-row { display:flex; gap:.75rem; }
+    .tl-dot { width:10px; height:10px; border-radius:50%; background:var(--color-primary,#2563eb); margin-top:5px; flex:none; }
+    .tl-body { flex:1; }
+    .tl-head { font-size:.9rem; margin-bottom:.15rem; }
+  `],
 })
 export class QuoteDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -50,6 +60,36 @@ export class QuoteDetailPage implements OnInit {
   readonly sendResult = signal<SendQuoteEmailResult | null>(null);
   readonly sendForm = this.fb.nonNullable.group({ to: [''], subject: [''], body: [''] });
   printDoc(): void { window.print(); }
+
+  // Negotiation timeline + record-response
+  readonly timeline = signal<QuoteFollowup[]>([]);
+  readonly showRecord = signal(false);
+  readonly recording = signal(false);
+  readonly recordForm = this.fb.nonNullable.group({
+    action: 'negotiate',
+    rejectReason: 'price',
+    counterAmount: [null as number | null],
+    message: '',
+    nextFollowUpDate: '',
+  });
+  readonly actionOptions: GwSelectOption[] = [
+    { value: 'negotiate', label: 'Negotiating / wants changes' },
+    { value: 'accept', label: 'Accepted' },
+    { value: 'reject', label: 'Rejected' },
+    { value: 'follow_up', label: 'Follow up later' },
+  ];
+  readonly rejectReasons: GwSelectOption[] = [
+    { value: 'price', label: 'Price too high' },
+    { value: 'lead_time', label: 'Lead time too long' },
+    { value: 'scope', label: 'Scope / specs not right' },
+    { value: 'went_elsewhere', label: 'Going with another supplier' },
+    { value: 'no_longer_required', label: 'No longer required' },
+    { value: 'other', label: 'Other' },
+  ];
+  copyLink(): void { const l = this.sendResult()?.link; if (l && navigator.clipboard) navigator.clipboard.writeText(l); }
+  followupLabel(k: string): string {
+    return { sent: 'Sent', accepted: 'Accepted', rejected: 'Rejected', negotiating: 'Negotiating', follow_up: 'Follow-up', note: 'Note', revised: 'Revised' }[k] ?? k;
+  }
 
   readonly current = computed<QuoteVersion | null>(() => this.quote()?.versions?.find((v) => v.isCurrent) ?? null);
 
@@ -82,6 +122,38 @@ export class QuoteDetailPage implements OnInit {
     this.svc.get(this.id).subscribe({
       next: (q) => { this.quote.set(q); this.loading.set(false); },
       error: () => this.loading.set(false),
+    });
+    this.loadTimeline();
+  }
+
+  private loadTimeline(): void {
+    this.svc.timeline(this.id).subscribe({ next: (t) => this.timeline.set(t), error: () => { /* timeline is best-effort */ } });
+  }
+
+  openRecord(): void {
+    this.recordForm.reset({ action: 'negotiate', rejectReason: 'price', counterAmount: null, message: '', nextFollowUpDate: '' });
+    this.error.set('');
+    this.showRecord.set(true);
+  }
+
+  record(): void {
+    if (this.recording()) return;
+    this.recording.set(true);
+    const v = this.recordForm.getRawValue();
+    this.svc.respond(this.id, {
+      action: v.action as 'accept' | 'reject' | 'negotiate' | 'follow_up' | 'note',
+      rejectReason: v.action === 'reject' ? v.rejectReason : undefined,
+      counterAmount: v.action === 'negotiate' ? (v.counterAmount ?? undefined) : undefined,
+      message: v.message || undefined,
+      nextFollowUpDate: (v.action === 'follow_up' || v.action === 'negotiate') ? (v.nextFollowUpDate || undefined) : undefined,
+    }).subscribe({
+      next: () => {
+        this.recording.set(false);
+        this.showRecord.set(false);
+        this.svc.get(this.id).subscribe((q) => this.quote.set(q));
+        this.loadTimeline();
+      },
+      error: (e) => { this.recording.set(false); this.error.set(e?.error?.message ?? 'Failed to record response'); },
     });
   }
 

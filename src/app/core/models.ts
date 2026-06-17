@@ -172,6 +172,39 @@ export interface SendQuoteEmailResult {
   to: string;
   delivered: boolean;
   queued: boolean;
+  link?: string;
+}
+
+/** Negotiation timeline entry. */
+export interface QuoteFollowup {
+  id: string;
+  kind: string;
+  source: string;
+  note?: string;
+  rejectReason?: string;
+  counterAmount?: number;
+  createdAt: string;
+}
+
+/** Public (customer-facing) quote view. */
+export interface PublicQuoteView extends QuoteDocument {
+  status: string;
+  canRespond: boolean;
+}
+export interface PublicRespond {
+  action: 'accept' | 'reject' | 'negotiate';
+  rejectReason?: string;
+  counterAmount?: number;
+  message?: string;
+}
+
+/** What an internal user records as the customer's response. */
+export interface RecordQuoteResponse {
+  action: 'accept' | 'reject' | 'negotiate' | 'follow_up' | 'note';
+  rejectReason?: string;
+  counterAmount?: number;
+  message?: string;
+  nextFollowUpDate?: string;
 }
 
 export interface SoLine {

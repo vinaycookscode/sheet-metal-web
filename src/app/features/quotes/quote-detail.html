@@ -12,6 +12,9 @@
       </div>
       <div class="d-flex gap-2">
         <gw-button variant="ghost" leadingIcon="Eye" (click)="showDoc.set(true)">Preview / Print</gw-button>
+        @if (q.status === 'sent' || q.status === 'negotiating') {
+          <gw-button variant="ghost" leadingIcon="MessageSquare" (click)="openRecord()">Record response</gw-button>
+        }
       </div>
     </div>
 
@@ -50,6 +53,29 @@
       </gw-card>
     }
 
+    <!-- Negotiation timeline -->
+    @if (timeline().length) {
+      <p class="muted mb-2 mt-4">Customer response history</p>
+      <gw-card padding="lg">
+        <div class="timeline">
+          @for (f of timeline(); track f.id) {
+            <div class="tl-row">
+              <div class="tl-dot"></div>
+              <div class="tl-body">
+                <div class="tl-head">
+                  <strong>{{ followupLabel(f.kind) }}</strong>
+                  <span class="muted">· {{ f.source === 'customer' ? 'from customer' : 'internal' }} · {{ f.createdAt | date:'dd MMM, HH:mm' }}</span>
+                </div>
+                @if (f.counterAmount) { <div>Proposed total: <strong>₹ {{ f.counterAmount | number:'1.0-2' }}</strong></div> }
+                @if (f.rejectReason) { <div class="muted">Reason: {{ f.rejectReason }}</div> }
+                @if (f.note) { <div>{{ f.note }}</div> }
+              </div>
+            </div>
+          }
+        </div>
+      </gw-card>
+    }
+
     <!-- Quote preview / print -->
     <gw-drawer [open]="showDoc()" size="xl" title="Quote preview" (openChange)="showDoc.set($event)">
       @if (showDoc()) { <app-quote-print [id]="q.id" /> }
@@ -65,8 +91,15 @@
       @if (sendResult(); as r) {
         <gw-alert [variant]="$any(r.delivered ? 'success' : 'warning')"
           [title]="r.delivered ? ('Emailed to ' + r.to) : 'Saved to outbox — not delivered yet'">
-          @if (!r.delivered) { <p style="margin:0">Email isn't configured on the server (SMTP), so the message is queued. Once mail is set up it will go out.</p> }
+          @if (!r.delivered) { <p style="margin:0 0 8px">Email isn't configured on the server (SMTP), so the message is queued. Once mail is set up it will go out.</p> }
         </gw-alert>
+        @if (r.link) {
+          <p class="muted" style="margin:.75rem 0 .25rem">Customer response link (you can also share this directly):</p>
+          <div class="d-flex gap-2" style="align-items:center">
+            <code style="flex:1; overflow:auto; padding:6px 8px; background:var(--surface-input,#f3f4f6); border-radius:6px; font-size:.8rem; white-space:nowrap">{{ r.link }}</code>
+            <gw-button variant="ghost" size="sm" (click)="copyLink()">Copy</gw-button>
+          </div>
+        }
       } @else {
         <form [formGroup]="sendForm" style="display:flex; flex-direction:column; gap:12px">
           <gw-form-field label="To" [required]="true" hint="Defaults to the customer's email">
@@ -88,6 +121,40 @@
           <gw-button variant="ghost" leadingIcon="Eye" (click)="showSend.set(false); showDoc.set(true)">Preview</gw-button>
           <gw-button variant="primary" leadingIcon="Send" [loading]="sending()" (click)="send()">Send email</gw-button>
         }
+      </div>
+    </gw-dialog>
+
+    <!-- Record customer response (phone/email reply) -->
+    <gw-dialog [open]="showRecord()" size="md" title="Record customer response"
+      description="Log what the customer said." (openChange)="showRecord.set($event)">
+      <form [formGroup]="recordForm" style="display:flex; flex-direction:column; gap:12px">
+        <gw-form-field label="Response">
+          <gw-select formControlName="action" [options]="actionOptions" />
+        </gw-form-field>
+        @if (recordForm.controls.action.value === 'reject') {
+          <gw-form-field label="Reason">
+            <gw-select formControlName="rejectReason" [options]="rejectReasons" />
+          </gw-form-field>
+        }
+        @if (recordForm.controls.action.value === 'negotiate') {
+          <gw-form-field label="Customer's target total (₹)">
+            <gw-input type="number" formControlName="counterAmount" placeholder="e.g. 108000" />
+          </gw-form-field>
+        }
+        @if (recordForm.controls.action.value === 'negotiate' || recordForm.controls.action.value === 'follow_up') {
+          <gw-form-field label="Next follow-up date">
+            <gw-date-input formControlName="nextFollowUpDate" />
+          </gw-form-field>
+        }
+        <gw-form-field label="Notes">
+          <textarea formControlName="message" rows="4"
+            style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px; font:inherit; resize:vertical"></textarea>
+        </gw-form-field>
+        @if (error()) { <gw-alert variant="danger" [title]="error()" /> }
+      </form>
+      <div gw-dialog-footer class="d-flex gap-2" style="justify-content:flex-end">
+        <gw-button variant="ghost" (click)="showRecord.set(false)">Cancel</gw-button>
+        <gw-button variant="primary" [loading]="recording()" (click)="record()">Save response</gw-button>
       </div>
     </gw-dialog>
   } @else {

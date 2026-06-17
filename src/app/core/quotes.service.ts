@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Quote, QuoteDocument, SendQuoteEmail, SendQuoteEmailResult } from './models';
+import { Quote, QuoteDocument, QuoteFollowup, RecordQuoteResponse, SendQuoteEmail, SendQuoteEmailResult } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class QuotesService {
@@ -16,6 +16,16 @@ export class QuotesService {
   /** Email the quote (PDF attached) to the customer. */
   sendEmail(id: string, dto: SendQuoteEmail) {
     return this.http.post<SendQuoteEmailResult>(`${this.base}/${id}/send-email`, dto);
+  }
+
+  /** Negotiation timeline (sends, responses, revisions, notes). */
+  timeline(id: string) {
+    return this.http.get<QuoteFollowup[]>(`${this.base}/${id}/timeline`);
+  }
+
+  /** Record a customer response internally (phone/email reply). */
+  respond(id: string, dto: RecordQuoteResponse) {
+    return this.http.post<{ status: string; nextFollowUpDate?: string | null }>(`${this.base}/${id}/respond`, dto);
   }
 
   list(status?: string) {

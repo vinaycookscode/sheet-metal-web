@@ -1,0 +1,100 @@
+<div class="wrap">
+  @if (loading()) {
+    <p class="muted" style="text-align:center">Loading your quotation…</p>
+  } @else if (error() && !view()) {
+    <gw-alert variant="danger" [title]="error()" />
+  } @else if (view(); as d) {
+    <div class="brand">
+      <h1>{{ d.seller.name }}</h1>
+      <p>Quotation {{ d.number }} · {{ d.date | date:'dd MMM yyyy' }}</p>
+    </div>
+
+    <!-- Quote summary -->
+    <gw-card padding="lg">
+      <p class="muted" style="margin-top:0">Prepared for <strong>{{ d.buyer.name }}</strong>@if (d.validUntil) { · valid until {{ d.validUntil | date:'dd MMM yyyy' }}}</p>
+      <table class="lines">
+        <thead>
+          <tr><th class="r">#</th><th>Description</th><th class="r">Qty</th><th class="r">Unit ₹</th><th class="r">Amount ₹</th></tr>
+        </thead>
+        <tbody>
+          @for (ln of d.lines; track ln.lineNo) {
+            <tr>
+              <td class="r">{{ ln.lineNo }}</td>
+              <td>{{ ln.description }}</td>
+              <td class="r">{{ ln.qty }}</td>
+              <td class="r">{{ ln.unitPrice | number:'1.2-2' }}</td>
+              <td class="r">{{ ln.amount | number:'1.2-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <table class="totals">
+        <tr><td>Subtotal</td><td class="r">₹ {{ d.totals.subtotal | number:'1.2-2' }}</td></tr>
+        <tr><td>Tax</td><td class="r">₹ {{ d.totals.taxTotal | number:'1.2-2' }}</td></tr>
+        <tr class="grand"><td>Total</td><td class="r">₹ {{ d.totals.grandTotal | number:'1.2-2' }}</td></tr>
+      </table>
+    </gw-card>
+
+    <!-- Response -->
+    @if (mode() === 'done') {
+      <gw-card padding="lg">
+        @switch (resultStatus()) {
+          @case ('accepted') { <gw-alert variant="success" title="Thank you — quotation accepted" >We've recorded your acceptance and will proceed with your order.</gw-alert> }
+          @case ('rejected') { <gw-alert variant="info" title="Thanks for letting us know" >We've recorded your response. We'd welcome the chance to quote again.</gw-alert> }
+          @default { <gw-alert variant="info" title="Thanks — we'll get back to you" >We've received your proposal and will revise the quotation and re-send it shortly.</gw-alert> }
+        }
+      </gw-card>
+    } @else if (!d.canRespond) {
+      <gw-card padding="lg">
+        <gw-alert variant="info" [title]="'This quotation has already been ' + d.status" />
+      </gw-card>
+    } @else {
+      <gw-card padding="lg">
+        @if (error()) { <gw-alert class="mb-3" variant="danger" [title]="error()" /> }
+
+        @if (mode() === 'view') {
+          <p style="margin-top:0"><strong>How would you like to respond?</strong></p>
+          <div class="actions">
+            <gw-button variant="primary" (click)="accept()" [loading]="submitting()">Accept quotation</gw-button>
+            <gw-button variant="secondary" (click)="mode.set('negotiate')">Propose changes</gw-button>
+            <gw-button variant="ghost" (click)="mode.set('reject')">Decline</gw-button>
+          </div>
+        }
+
+        @if (mode() === 'negotiate') {
+          <form [formGroup]="negotiateForm" class="resp-form">
+            <p style="margin:0"><strong>Propose changes</strong></p>
+            <gw-form-field label="Your target total (₹)" hint="Leave blank if it's not about price">
+              <gw-input type="number" formControlName="counterAmount" placeholder="e.g. 108000" />
+            </gw-form-field>
+            <gw-form-field label="Message">
+              <textarea formControlName="message" rows="4" placeholder="e.g. Need ~10% off and delivery by the 30th"></textarea>
+            </gw-form-field>
+            <div class="actions">
+              <gw-button variant="primary" (click)="negotiate()" [loading]="submitting()">Send proposal</gw-button>
+              <gw-button variant="ghost" (click)="mode.set('view')">Back</gw-button>
+            </div>
+          </form>
+        }
+
+        @if (mode() === 'reject') {
+          <form [formGroup]="rejectForm" class="resp-form">
+            <p style="margin:0"><strong>Decline quotation</strong></p>
+            <gw-form-field label="Reason">
+              <gw-select formControlName="rejectReason" [options]="rejectReasons" />
+            </gw-form-field>
+            <gw-form-field label="Anything else? (optional)">
+              <textarea formControlName="message" rows="3"></textarea>
+            </gw-form-field>
+            <div class="actions">
+              <gw-button variant="primary" (click)="reject()" [loading]="submitting()">Submit</gw-button>
+              <gw-button variant="ghost" (click)="mode.set('view')">Back</gw-button>
+            </div>
+          </form>
+        }
+      </gw-card>
+    }
+
+    <p class="muted" style="text-align:center; font-size:.8rem">This is a secure link for {{ d.buyer.name }}. Please don't forward it.</p>
+  }
+</div>
