@@ -16,22 +16,19 @@
 
     <app-next-action-bar [stages]="journeyStages" [current]="1" [hint]="hint()" [hasActions]="hasActions()">
       @if (q.salesOrder) {
-        <gw-button primary-action variant="primary" leadingIcon="ClipboardList" [routerLink]="['/sales-orders', q.salesOrder.id]">
-          Open {{ q.salesOrder.number }}
-        </gw-button>
-      } @else {
-        @if (q.status === 'draft') {
-          <gw-button primary-action variant="primary" leadingIcon="Send" [loading]="busy()" (click)="setStatus('sent')">Send to customer</gw-button>
-        }
-        @if (q.status === 'sent' || q.status === 'accepted') {
-          <gw-button primary-action variant="primary" leadingIcon="ClipboardList" [loading]="busy()" (click)="createSO()">Create sales order</gw-button>
-        }
-        @if (q.status === 'sent') {
-          <ng-container secondary-actions>
-            <gw-button variant="ghost" [disabled]="busy()" (click)="setStatus('accepted')">Accept</gw-button>
-            <gw-button variant="ghost" [disabled]="busy()" (click)="setStatus('rejected')">Reject</gw-button>
-          </ng-container>
-        }
+        <gw-button primary-action variant="primary" leadingIcon="ClipboardList" [routerLink]="['/sales-orders', q.salesOrder.id]">Open {{ q.salesOrder.number }}</gw-button>
+      }
+      @if (!q.salesOrder && q.status === 'draft') {
+        <gw-button primary-action variant="primary" leadingIcon="Send" [loading]="busy()" (click)="setStatus('sent')">Send to customer</gw-button>
+      }
+      @if (!q.salesOrder && (q.status === 'sent' || q.status === 'accepted')) {
+        <gw-button primary-action variant="primary" leadingIcon="ClipboardList" [loading]="busy()" (click)="createSO()">Create sales order</gw-button>
+      }
+      @if (!q.salesOrder && q.status === 'sent') {
+        <ng-container secondary-actions>
+          <gw-button variant="ghost" [disabled]="busy()" (click)="setStatus('accepted')">Accept</gw-button>
+          <gw-button variant="ghost" [disabled]="busy()" (click)="setStatus('rejected')">Reject</gw-button>
+        </ng-container>
       }
     </app-next-action-bar>
 
