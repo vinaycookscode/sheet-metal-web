@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Quote, QuoteDocument, QuoteFollowup, RecordQuoteResponse, SendQuoteEmail, SendQuoteEmailResult } from './models';
+import { Quote, QuoteDocument, QuoteFollowup, QuoteFollowupRow, RecordQuoteResponse, SendQuoteEmail, SendQuoteEmailResult } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class QuotesService {
@@ -31,6 +31,10 @@ export class QuotesService {
   list(status?: string) {
     const q = status ? `?status=${status}` : '';
     return this.http.get<Quote[]>(`${this.base}${q}`);
+  }
+  /** Quotes awaiting a customer response / under negotiation, with the latest reply. */
+  followups() {
+    return this.http.get<QuoteFollowupRow[]>(`${this.base}/followups`);
   }
   get(id: string) {
     return this.http.get<Quote>(`${this.base}/${id}`);

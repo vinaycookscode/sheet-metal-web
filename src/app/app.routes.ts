@@ -28,6 +28,7 @@ export const routes: Routes = [
       { path: 'inquiries', loadComponent: () => import('./features/inquiries/inquiries-list').then((m) => m.InquiriesListPage) },
       { path: 'inquiries/:id', loadComponent: () => import('./features/inquiries/inquiry-detail').then((m) => m.InquiryDetailPage) },
       { path: 'quotes', loadComponent: () => import('./features/quotes/quotes-list').then((m) => m.QuotesListPage) },
+      { path: 'follow-ups', loadComponent: () => import('./features/quotes/followups-list').then((m) => m.FollowupsListPage) },
       { path: 'quotes/:id', loadComponent: () => import('./features/quotes/quote-detail').then((m) => m.QuoteDetailPage) },
       { path: 'sales-orders', loadComponent: () => import('./features/sales-orders/so-list').then((m) => m.SoListPage) },
       { path: 'sales-orders/:id', loadComponent: () => import('./features/sales-orders/so-detail').then((m) => m.SoDetailPage) },

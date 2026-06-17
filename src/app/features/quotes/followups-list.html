@@ -1,0 +1,44 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Follow-ups</h1>
+      <p class="muted">Quotes awaiting a customer decision — open one to see the full response history.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="muted mt-3">Loading…</p>
+  } @else if (rows().length === 0) {
+    <gw-card padding="lg">
+      <p class="muted" style="text-align:center; margin:0">No quotes are awaiting a response right now.</p>
+    </gw-card>
+  } @else {
+    <div class="fu-list">
+      @for (r of rows(); track r.id) {
+        <gw-card class="fu-card" elevation="sm" padding="md" [hoverable]="true" (click)="open(r.id)">
+          <div class="fu-top">
+            <div class="fu-left">
+              <strong>{{ r.number }}</strong>
+              <gw-badge [variant]="$any(statusVariant(r.status))">{{ r.status }}</gw-badge>
+              <span class="fu-meta">{{ r.customerName }}</span>
+            </div>
+            <div class="fu-meta">₹ {{ r.grandTotal | number:'1.0-0' }}</div>
+          </div>
+
+          <p class="fu-resp" [class.fu-resp--customer]="r.lastResponse?.source === 'customer'">
+            {{ responseSummary(r) }}
+            @if (r.lastResponse?.note) { <span class="fu-meta">— "{{ r.lastResponse?.note }}"</span> }
+          </p>
+
+          <div class="fu-meta">
+            @if (r.lastResponse) { Last activity {{ r.lastResponse.createdAt | date:'dd MMM, HH:mm' }} · }
+            {{ r.responseCount }} {{ r.responseCount === 1 ? 'entry' : 'entries' }}
+            @if (r.nextFollowUpDate) {
+              · <span [class.fu-due]="isOverdue(r)">follow up {{ r.nextFollowUpDate | date:'dd MMM' }}{{ isOverdue(r) ? ' (due)' : '' }}</span>
+            }
+          </div>
+        </gw-card>
+      }
+    </div>
+  }
+</div>

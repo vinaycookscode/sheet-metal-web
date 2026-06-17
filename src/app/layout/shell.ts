@@ -67,6 +67,7 @@ export class ShellComponent {
         { key: 'projects', label: 'Projects', icon: 'Layers', link: '/projects', perms: ['project.read'] },
         { key: 'inquiries', label: 'Inquiries', icon: 'MessageSquare', link: '/inquiries', perms: ['inquiry.read'] },
         { key: 'quotes', label: 'Quotes', icon: 'FileText', link: '/quotes', perms: ['quote.read'] },
+        { key: 'follow-ups', label: 'Follow-ups', icon: 'MessageSquare', link: '/follow-ups', perms: ['quote.read'] },
         { key: 'sales-orders', label: 'Sales Orders', icon: 'ClipboardList', link: '/sales-orders', perms: ['so.read'] },
       ],
     },
