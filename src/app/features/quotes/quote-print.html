@@ -1,0 +1,81 @@
+@if (loading()) {
+  <p class="status">Loading…</p>
+} @else if (error()) {
+  <p class="status error">{{ error() }}</p>
+} @else if (doc(); as d) {
+  <div class="sheet">
+    <!-- Header -->
+    <div class="head">
+      <div class="seller">
+        <div class="seller-name">{{ d.seller.name }}</div>
+        @if (d.seller.plant) { <div>{{ d.seller.plant }}</div> }
+        <div class="muted">GSTIN: <strong>{{ d.seller.gstin || '—' }}</strong> · State Code: {{ d.seller.stateCode || '—' }}</div>
+      </div>
+      <div class="title-box">
+        <div class="doc-title">{{ d.title }}</div>
+        <table class="meta">
+          <tr><td>Quote No.</td><td><strong>{{ d.number }}</strong></td></tr>
+          <tr><td>Date</td><td>{{ d.date | date:'dd MMM yyyy' }}</td></tr>
+          @if (d.validUntil) { <tr><td>Valid Until</td><td>{{ d.validUntil | date:'dd MMM yyyy' }}</td></tr> }
+          @if (d.leadTimeDays) { <tr><td>Lead Time</td><td>{{ d.leadTimeDays }} days</td></tr> }
+        </table>
+      </div>
+    </div>
+
+    <!-- Customer -->
+    <div class="parties">
+      <div class="party">
+        <div class="party-label">To</div>
+        <div class="party-name">{{ d.buyer.name }}</div>
+        @if (d.buyer.email) { <div>{{ d.buyer.email }}</div> }
+        <div class="muted">GSTIN: {{ d.buyer.gstin || '—' }} · State Code: {{ d.buyer.stateCode || '—' }}</div>
+      </div>
+    </div>
+
+    <!-- Lines -->
+    <table class="lines">
+      <thead>
+        <tr>
+          <th class="r" style="width:32px">#</th>
+          <th>Description</th>
+          <th class="r" style="width:70px">Qty</th>
+          <th class="r" style="width:110px">Unit ₹</th>
+          <th class="r" style="width:120px">Amount ₹</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ln of d.lines; track ln.lineNo) {
+          <tr>
+            <td class="r">{{ ln.lineNo }}</td>
+            <td>{{ ln.description }}</td>
+            <td class="r">{{ ln.qty }}</td>
+            <td class="r">{{ ln.unitPrice | number:'1.2-2' }}</td>
+            <td class="r">{{ ln.amount | number:'1.2-2' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="foot">
+      <div class="words">
+        <div class="party-label">Amount in words</div>
+        <div class="words-text">{{ d.amountInWords }}</div>
+        @if (d.terms) { <div class="muted" style="margin-top:10px">Terms: {{ d.terms }}</div> }
+      </div>
+      <table class="totals">
+        <tr><td>Subtotal</td><td class="r">{{ d.totals.subtotal | number:'1.2-2' }}</td></tr>
+        <tr><td>Tax</td><td class="r">{{ d.totals.taxTotal | number:'1.2-2' }}</td></tr>
+        <tr class="grand"><td>Grand Total</td><td class="r">₹ {{ d.totals.grandTotal | number:'1.2-2' }}</td></tr>
+      </table>
+    </div>
+
+    <div class="sign">
+      <div class="declaration muted">This is a quotation, not a tax invoice. Prices are valid until the date shown above.</div>
+      <div class="sign-box">
+        <div>For <strong>{{ d.seller.name }}</strong></div>
+        <div class="sign-line">Authorised Signatory</div>
+      </div>
+    </div>
+  </div>
+}

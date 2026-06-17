@@ -54,6 +54,7 @@ export class InquiriesListPage implements OnInit {
   readonly addingCustomer = signal(false);
   readonly addingProject = signal(false);
   readonly newCustomerName = this.fb.control('', { nonNullable: true });
+  readonly newCustomerEmail = this.fb.control('', { nonNullable: true });
   readonly newProjectName = this.fb.control('', { nonNullable: true });
 
   readonly columns: GwTableColumn[] = [
@@ -134,11 +135,12 @@ export class InquiriesListPage implements OnInit {
     const name = this.newCustomerName.value.trim();
     if (!name || this.addingCustomer()) return;
     this.addingCustomer.set(true);
-    this.customersSvc.create({ name }).subscribe({
+    this.customersSvc.create({ name, email: this.newCustomerEmail.value.trim() || undefined }).subscribe({
       next: (c) => {
         this.customerOptions.update((opts) => [...opts, { value: c.id, label: `${c.code} — ${c.name}` }]);
         this.form.controls.customerId.setValue(c.id);
         this.newCustomerName.setValue('');
+        this.newCustomerEmail.setValue('');
         this.showNewCustomer.set(false);
         this.addingCustomer.set(false);
       },

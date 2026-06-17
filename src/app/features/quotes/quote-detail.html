@@ -10,6 +10,9 @@
         <gw-badge [variant]="$any(statusVariant(q.status))">{{ q.status }}</gw-badge>
         <span class="muted">v{{ q.currentVersion }} · {{ (q.versions ?? []).length }} version(s)</span>
       </div>
+      <div class="d-flex gap-2">
+        <gw-button variant="ghost" leadingIcon="Eye" (click)="showDoc.set(true)">Preview / Print</gw-button>
+      </div>
     </div>
 
     @if (error()) { <gw-alert class="mb-4" variant="danger" [title]="error()" /> }
@@ -19,7 +22,7 @@
         <gw-button primary-action variant="primary" leadingIcon="ClipboardList" [routerLink]="['/sales-orders', q.salesOrder.id]">Open {{ q.salesOrder.number }}</gw-button>
       }
       @if (!q.salesOrder && q.status === 'draft') {
-        <gw-button primary-action variant="primary" leadingIcon="Send" [loading]="busy()" (click)="setStatus('sent')">Send to customer</gw-button>
+        <gw-button primary-action variant="primary" leadingIcon="Send" (click)="openSend()">Send to customer</gw-button>
       }
       @if (!q.salesOrder && (q.status === 'sent' || q.status === 'accepted')) {
         <gw-button primary-action variant="primary" leadingIcon="ClipboardList" [loading]="busy()" (click)="createSO()">Create sales order</gw-button>
@@ -46,6 +49,47 @@
         <gw-table [columns]="columns" [data]="v.lines ?? []" emptyText="No lines" />
       </gw-card>
     }
+
+    <!-- Quote preview / print -->
+    <gw-drawer [open]="showDoc()" size="xl" title="Quote preview" (openChange)="showDoc.set($event)">
+      @if (showDoc()) { <app-quote-print [id]="q.id" /> }
+      <div gw-drawer-footer class="d-flex gap-2" style="justify-content:flex-end">
+        <gw-button variant="ghost" (click)="showDoc.set(false)">Close</gw-button>
+        <gw-button variant="primary" leadingIcon="Printer" (click)="printDoc()">Print / Save PDF</gw-button>
+      </div>
+    </gw-drawer>
+
+    <!-- Email the quote -->
+    <gw-dialog [open]="showSend()" size="md" title="Email quote to customer"
+      description="Sends the quote as a PDF attachment." (openChange)="showSend.set($event)">
+      @if (sendResult(); as r) {
+        <gw-alert [variant]="$any(r.delivered ? 'success' : 'warning')"
+          [title]="r.delivered ? ('Emailed to ' + r.to) : 'Saved to outbox — not delivered yet'">
+          @if (!r.delivered) { <p style="margin:0">Email isn't configured on the server (SMTP), so the message is queued. Once mail is set up it will go out.</p> }
+        </gw-alert>
+      } @else {
+        <form [formGroup]="sendForm" style="display:flex; flex-direction:column; gap:12px">
+          <gw-form-field label="To" [required]="true" hint="Defaults to the customer's email">
+            <gw-input formControlName="to" type="email" placeholder="customer@example.com" />
+          </gw-form-field>
+          <gw-form-field label="Subject"><gw-input formControlName="subject" /></gw-form-field>
+          <gw-form-field label="Message">
+            <textarea formControlName="body" rows="6"
+              style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px; font:inherit; resize:vertical"></textarea>
+          </gw-form-field>
+          @if (sendError()) { <gw-alert variant="danger" [title]="sendError()" /> }
+        </form>
+      }
+      <div gw-dialog-footer class="d-flex gap-2" style="justify-content:flex-end">
+        @if (sendResult()) {
+          <gw-button variant="primary" (click)="showSend.set(false)">Done</gw-button>
+        } @else {
+          <gw-button variant="ghost" (click)="showSend.set(false)">Cancel</gw-button>
+          <gw-button variant="ghost" leadingIcon="Eye" (click)="showSend.set(false); showDoc.set(true)">Preview</gw-button>
+          <gw-button variant="primary" leadingIcon="Send" [loading]="sending()" (click)="send()">Send email</gw-button>
+        }
+      </div>
+    </gw-dialog>
   } @else {
     <gw-alert class="mt-3" variant="danger" title="Quote not found" />
   }

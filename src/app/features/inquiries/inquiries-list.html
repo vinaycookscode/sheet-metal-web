@@ -18,6 +18,7 @@
             } @else {
               <div class="inline-add">
                 <gw-input [formControl]="newCustomerName" placeholder="New customer name" />
+                <gw-input [formControl]="newCustomerEmail" type="email" placeholder="Email (optional)" />
                 <gw-button variant="secondary" size="sm" type="button" [loading]="addingCustomer()" (click)="addCustomerInline()">Add</gw-button>
                 <gw-button variant="ghost" size="sm" type="button" (click)="showNewCustomer.set(false)">Cancel</gw-button>
               </div>

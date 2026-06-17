@@ -54,6 +54,7 @@ export interface Customer {
   id: string;
   code: string;
   name: string;
+  email?: string;
   gstin?: string;
   stateCode?: string;
   paymentTermsDays: number;
@@ -64,6 +65,7 @@ export interface CreateCustomer {
   /** Optional — auto-allocated (CUST-...) by the API when omitted. */
   code?: string;
   name: string;
+  email?: string;
   gstin?: string;
   stateCode?: string;
   paymentTermsDays?: number;
@@ -144,6 +146,32 @@ export interface Quote {
   currentVersion: number; status: string; winLossReason?: string; versions?: QuoteVersion[]; createdAt: string;
   /** Present once this quote has been converted — link to the order instead of re-creating. */
   salesOrder?: { id: string; number: string };
+}
+
+export interface QuoteDocument {
+  title: string;
+  number: string;
+  date: string;
+  validUntil?: string | null;
+  leadTimeDays?: number | null;
+  terms?: string | null;
+  seller: { name: string; plant?: string; gstin?: string; stateCode?: string };
+  buyer: { name: string; email?: string; gstin?: string; stateCode?: string };
+  lines: Array<{ lineNo: number; description: string; qty: number; unitPrice: number; amount: number }>;
+  totals: { subtotal: number; taxTotal: number; grandTotal: number };
+  amountInWords: string;
+}
+
+export interface SendQuoteEmail {
+  to?: string;
+  subject?: string;
+  body?: string;
+}
+
+export interface SendQuoteEmailResult {
+  to: string;
+  delivered: boolean;
+  queued: boolean;
 }
 
 export interface SoLine {

@@ -37,6 +37,7 @@ export class CustomersPage implements OnInit {
   readonly columns: GwTableColumn[] = [
     { key: 'code', label: 'Code', width: '130px' },
     { key: 'name', label: 'Name' },
+    { key: 'email', label: 'Email', width: '200px' },
     { key: 'gstin', label: 'GSTIN', width: '170px' },
     { key: 'stateCode', label: 'State', width: '70px', align: 'center' },
     { key: 'paymentTermsDays', label: 'Terms (d)', width: '100px', align: 'right' },
@@ -46,6 +47,7 @@ export class CustomersPage implements OnInit {
   readonly form = this.fb.nonNullable.group({
     code: [''],
     name: ['', Validators.required],
+    email: [''],
     gstin: [''],
     stateCode: [''],
     paymentTermsDays: [30],
@@ -77,11 +79,11 @@ export class CustomersPage implements OnInit {
     this.saving.set(true);
     this.error.set('');
     const v = this.form.getRawValue();
-    this.svc.create({ ...v, code: v.code || undefined }).subscribe({
+    this.svc.create({ ...v, code: v.code || undefined, email: v.email || undefined }).subscribe({
       next: () => {
         this.saving.set(false);
         this.showForm.set(false);
-        this.form.reset({ code: '', name: '', gstin: '', stateCode: '', paymentTermsDays: 30, creditLimit: 0 });
+        this.form.reset({ code: '', name: '', email: '', gstin: '', stateCode: '', paymentTermsDays: 30, creditLimit: 0 });
         this.load();
       },
       error: (e) => {

@@ -1,12 +1,22 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Quote } from './models';
+import { Quote, QuoteDocument, SendQuoteEmail, SendQuoteEmailResult } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class QuotesService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/quotes`;
+
+  /** Read model for the printable/preview quote document. */
+  document(id: string) {
+    return this.http.get<QuoteDocument>(`${this.base}/${id}/document`);
+  }
+
+  /** Email the quote (PDF attached) to the customer. */
+  sendEmail(id: string, dto: SendQuoteEmail) {
+    return this.http.post<SendQuoteEmailResult>(`${this.base}/${id}/send-email`, dto);
+  }
 
   list(status?: string) {
     const q = status ? `?status=${status}` : '';
