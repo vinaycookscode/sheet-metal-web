@@ -2,5 +2,5 @@
 // fileReplacements during `ng build`. Set apiUrl to the deployed Railway API.
 export const environment = {
   production: true,
-  apiUrl: 'https://REPLACE-WITH-RAILWAY-API/api',
+  apiUrl: 'https://sheet-metal-api-production.up.railway.app/api',
 };
