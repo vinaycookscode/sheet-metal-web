@@ -1,0 +1,12 @@
+{
+  // Cloudflare Worker serving the built Angular SPA as static assets.
+  // The Angular application builder outputs to dist/sheet-metal-web/browser
+  // (index.html lives there), and SPA routes fall back to index.html.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sheet-metal-web",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    "directory": "./dist/sheet-metal-web/browser",
+    "not_found_handling": "single-page-application"
+  }
+}
